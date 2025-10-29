@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>About — Vinyl Tech</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="logo">VINYL TECH</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </div>
+    </nav>
+
+    <main style="max-width:900px; margin:0 auto;">
+        <section class="panel" style="padding:28px; max-width:900px; margin:0 auto;">
+            <h1 style="font-weight:700; margin-bottom:8px;">About Vinyl Tech</h1>
+            <p style="color:var(--bg-deeper); margin-bottom:18px;">We craft premium turntable accessories and care kits with a minimalist aesthetic inspired by premium audio brands. Our focus is on precision, materials and presentation — keeping vinyl listening tactile and pristine.</p>
+
+            <section style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+                <div class="info-box">
+                    <h4>Quality Components</h4>
+                    <p>High-grade parts selected for durability and sonic neutrality.</p>
+                </div>
+                <div class="info-box">
+                    <h4>Design Philosophy</h4>
+                    <p>Subtle, timeless design that complements any listening space.</p>
+                </div>
+                <div class="info-box">
+                    <h4>Support</h4>
+                    <p>Easy returns and friendly, knowledgeable support.</p>
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

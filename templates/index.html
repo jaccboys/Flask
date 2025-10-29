@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Vinyl Tech — Home</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Keep the same bright / elegant aesthetic as products.html */
+        body.products-page {
+            background: linear-gradient(180deg,#faf7f4 0%, #f3efe9 100%);
+            color: #1a1a1a;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        nav { 
+            background: rgba(255,255,255,0.45);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 6px 20px rgba(10,10,10,0.05);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            backdrop-filter: blur(6px) saturate(120%);
+        }
+        .logo { color: #111; font-weight:700; letter-spacing:1px; }
+        .nav-links a { color: rgba(20,20,20,0.7); }
+        .nav-links a:hover { color: #111; }
+
+        .products-container { max-width:1200px; margin:120px auto 80px; padding:0 20px; }
+        .page-hero {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:24px;
+            margin-bottom:28px;
+        }
+        .hero-copy { max-width:660px; }
+        .hero-copy h1 {
+            font-family: 'Playfair Display', serif;
+            font-size:2.6rem;
+            margin:0 0 10px 0;
+            color:#0f0f0f;
+            line-height:1.02;
+        }
+        .hero-copy p { color: #5b5b5b; margin-bottom:14px; font-size:1.05rem; }
+        .hero-actions { display:flex; gap:12px; align-items:center; }
+
+        .cta-primary {
+            background: #111;
+            color:#fff;
+            padding:10px 16px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+        }
+        .cta-ghost {
+            background: transparent;
+            border: 1px solid rgba(17,17,17,0.08);
+            color:#111;
+            padding:10px 16px;
+            border-radius:8px;
+            text-decoration:none;
+        }
+
+        .search-bar {
+            background:#fff;
+            border-radius:10px;
+            padding:10px 12px;
+            box-shadow: 0 8px 24px rgba(10,10,10,0.04);
+            display:flex;
+            gap:8px;
+            align-items:center;
+            min-width:260px;
+        }
+        .search-bar input { border:0; outline:0; background:transparent; font-size:0.95rem; color:#1a1a1a; width:100%; }
+
+        /* Horizontal category panels */
+        .category-panel { overflow:hidden; border-radius:12px; padding:0; display:block; }
+        .category-inner { display:grid; grid-template-columns:repeat(2,1fr); gap:0; align-items:stretch; }
+        .category-media { min-height:420px; background:#f6f6f6; display:flex; align-items:center; justify-content:center; }
+        .category-content { padding:48px 44px; display:flex; flex-direction:column; gap:18px; justify-content:center; }
+
+        /* Featured grid (small samples row) */
+        .featured-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-top:1rem; }
+        .featured-card {
+            border-radius:10px; overflow:hidden; background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+            border:1px solid rgba(255,255,255,0.03);
+        }
+        .featured-card img { width:100%; height:180px; object-fit:cover; display:block; }
+        .featured-card .card-body { padding:12px 14px; }
+        .featured-card h3 { margin-bottom:6px; font-size:1.05rem; color:#111; }
+        .featured-card p { color:#6b6b6b; font-size:0.95rem; }
+
+        @media (max-width:900px){
+            .page-hero { flex-direction:column; align-items:flex-start; gap:16px; }
+            .category-inner { grid-template-columns: 1fr; }
+            .category-media { min-height:240px; }
+        }
+    </style>
+</head>
+<body class="products-page">
+    <nav>
+        <div class="logo">VINYL TECH</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('turntables') }}">Turntables</a>
+            <a href="{{ url_for('speakers') }}">Speakers</a>
+            <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </div>
+    </nav>
+
+    <main class="products-container container">
+        <header class="page-hero">
+            <div class="hero-copy">
+                <h1>Essential Accessories<br><span style="font-weight:400; color:#6b6b6b; font-size:1.05rem;">Precision parts and care kits for discerning listeners</span></h1>
+                <p>Curated collection of turntables, speakers and amplifiers. Photography-led presentation and refined details for confident buying.</p>
+                <div class="hero-actions">
+                    <a class="cta-primary" href="{{ url_for('products') }}">Shop all</a>
+                    <a class="cta-ghost" href="{{ url_for('about') }}">About</a>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-end;">
+                <div class="search-bar" role="search" aria-label="Search site">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden style="opacity:0.6"><path d="M21 21l-4.35-4.35" stroke="#333" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input type="search" placeholder="Search products…" aria-label="Search products">
+                </div>
+                <div style="font-size:0.95rem; color:#6b6b6b;">Free returns • 2‑year warranty</div>
+            </div>
+        </header>
+
+        {# Horizontal category sections (alternating image / text) #}
+        {% set sections = [("Turntables","Turntable","turntables"),
+                          ("Speakers","Speaker","speakers"),
+                          ("Amplifiers","Amplifier","amplifiers")] %}
+
+        <section style="display:flex; flex-direction:column; gap:36px; margin-bottom:40px;">
+            {% for title, key, route in sections %}
+                {% set item = samples.get(key) %}
+                <section class="category-panel">
+                    <div class="category-inner">
+                        {% if loop.index is odd %}
+                            <div class="category-media">
+                                {% if item %}
+                                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                                {% else %}
+                                    <div style="padding:28px; color:#6b6b6b;">No sample available</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="category-content">
+                                <h2 style="font-family: 'Playfair Display', serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                                <p style="color:#6b6b6b; margin:0; max-width:62ch;">
+                                    {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
+                                </p>
+                                <div style="display:flex; gap:12px; margin-top:6px;">
+                                    <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="category-content">
+                                <h2 style="font-family: 'Playfair Display', serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                                <p style="color:#6b6b6b; margin:0; max-width:62ch;">
+                                    {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
+                                </p>
+                                <div style="display:flex; gap:12px; margin-top:6px;">
+                                    <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
+                                    {% if item %}
+                                        <a class="cta-ghost" href="{{ url_for(route) }}#product-{{ item.id }}">View sample</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="category-media">
+                                {% if item %}
+                                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                                {% else %}
+                                    <div style="padding:28px; color:#6b6b6b;">No sample available</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endfor %}
+        </section>
+
+        {# Quick samples grid similar to products page #}
+        <section class="section">
+            <h3 style="margin-bottom:10px;">Quick samples</h3>
+            <div class="featured-grid">
+                {% for key, item in samples.items() %}
+                    {% if item %}
+                    <article class="featured-card panel" style="min-height:180px;">
+                        <img src="{{ item.image }}" alt="{{ item.name }}">
+                        <div class="card-body">
+                            <h3>{{ item.name }}</h3>
+                            <p style="margin-bottom:8px; color:#6b6b6b; font-size:0.95rem;">{{ item.description }}</p>
+                            <div class="kv">
+                                <span class="tag">{{ key }}</span>
+                                <span style="margin-left:auto; font-weight:700;">${{ '%.2f'|format(item.price) }}</span>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

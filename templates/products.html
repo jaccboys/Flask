@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>All Products — Vinyl Tech</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- elegant type for headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Page-specific bright, elegant aesthetic inspired by premium product sites */
+        body.products-page {
+            background: linear-gradient(180deg,#faf7f4 0%, #f3efe9 100%);
+            color: #1a1a1a;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        nav { 
+            background: rgba(255,255,255,0.45);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 6px 20px rgba(10,10,10,0.05);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            backdrop-filter: blur(6px) saturate(120%);
+        }
+        .logo { color: #111; font-weight:700; letter-spacing:1px; }
+        .nav-links a { color: rgba(20,20,20,0.7); }
+        .nav-links a:hover { color: #111; }
+
+        .products-container { max-width:1200px; margin:120px auto 80px; padding:0 20px; }
+        .page-hero {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:24px;
+            margin-bottom:28px;
+        }
+        .hero-copy {
+            max-width:660px;
+        }
+        .hero-copy h1 {
+            font-family: 'Playfair Display', serif;
+            font-size:2.6rem;
+            margin:0 0 10px 0;
+            color:#0f0f0f;
+            line-height:1.02;
+        }
+        .hero-copy p {
+            color: #5b5b5b;
+            margin-bottom:14px;
+            font-size:1.05rem;
+        }
+        .hero-actions { display:flex; gap:12px; align-items:center; }
+
+        .cta-primary {
+            background: #111;
+            color:#fff;
+            padding:10px 16px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+        }
+        .cta-ghost {
+            background: transparent;
+            border: 1px solid rgba(17,17,17,0.08);
+            color:#111;
+            padding:10px 16px;
+            border-radius:8px;
+            text-decoration:none;
+        }
+
+        .search-bar {
+            background:#fff;
+            border-radius:10px;
+            padding:10px 12px;
+            box-shadow: 0 8px 24px rgba(10,10,10,0.04);
+            display:flex;
+            gap:8px;
+            align-items:center;
+            min-width:260px;
+        }
+        .search-bar input {
+            border:0;
+            outline:0;
+            background:transparent;
+            font-size:0.95rem;
+            color:#1a1a1a;
+            width:100%;
+        }
+
+        /* Product grid: large photography, airy cards */
+        .product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; margin-top:18px; }
+        .product-card {
+            background: #fff;
+            border-radius:12px;
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 46px rgba(18,18,18,0.08); }
+        .product-media { width:100%; height:320px; background:#f6f6f6; display:block; object-fit:cover; }
+        .product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; }
+        .product-title { font-family: 'Playfair Display', serif; font-size:1.15rem; color:#111; margin:0; }
+        .product-meta { color:#6b6b6b; font-size:0.95rem; }
+        .product-desc { color:#5c5c5c; font-size:0.95rem; margin-top:8px; flex:1; }
+        .product-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
+        .price { font-weight:700; color:#111; font-size:1.05rem; }
+        .btn-buy {
+            background: linear-gradient(180deg,#111,#000);
+            color:#fff;
+            padding:8px 14px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+            box-shadow: 0 8px 28px rgba(17,17,17,0.12);
+        }
+
+        /* compact card variant for smaller items */
+        .small-meta { display:flex; gap:8px; align-items:center; color:#8a8a8a; font-size:0.9rem; }
+
+        @media (max-width:900px){
+            .product-media { height:220px; }
+            .page-hero { flex-direction:column; align-items:flex-start; gap:16px; }
+        }
+    </style>
+</head>
+<body class="products-page">
+    <nav>
+        <div class="logo">VINYL TECH</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('turntables') }}">Turntables</a>
+            <a href="{{ url_for('speakers') }}">Speakers</a>
+            <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </div>
+    </nav>
+
+    <main class="products-container container">
+        <header class="page-hero">
+            <div class="hero-copy">
+                <h1>Essential Accessories<br><span style="font-weight:400; color:#6b6b6b; font-size:1.05rem;">Precision parts and care kits for discerning listeners</span></h1>
+                <p>Curated collection of turntables, replacement styli and anti‑static care kits. Photography-focused listings and refined product details for confident buying.</p>
+                <div class="hero-actions">
+                    <a class="cta-primary" href="{{ url_for('products') }}">Shop all</a>
+                    <a class="cta-ghost" href="#collections">Collections</a>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-end;">
+                <div class="search-bar" role="search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden style="opacity:0.6"><path d="M21 21l-4.35-4.35" stroke="#333" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input type="search" placeholder="Search products…" aria-label="Search products">
+                </div>
+                <div style="font-size:0.95rem; color:#6b6b6b;">Free returns • 2‑year warranty</div>
+            </div>
+        </header>
+
+        <header style="margin-bottom:18px;">
+            <h1 style="margin-bottom:6px;">All Products</h1>
+            <p style="color:var(--muted);">Complete catalogue of turntables, speakers, amplifiers and accessories.</p>
+        </header>
+
+        <section class="product-grid" aria-live="polite">
+            {% for p in products %}
+            <article class="product-card" id="product-{{ p.id }}">
+                <img class="product-media" src="{{ p.image }}" alt="{{ p.name }}">
+                <div class="product-body">
+                    <div>
+                        <h3 class="product-title">{{ p.name }}</h3>
+                        <div class="product-meta small-meta">
+                            <span>{{ p.category }}</span>
+                            <span>•</span>
+                            <span>{{ p.get('stock', '—') }} in stock</span>
+                        </div>
+                        <p class="product-desc">{{ p.description }}</p>
+                    </div>
+                    <div class="product-footer">
+                        <div class="price">${{ '%.2f'|format(p.price) }}</div>
+                        <a class="btn-buy" href="mailto:orders@example.com?subject=Order%20{{ p.name|urlencode }}">Buy</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>
