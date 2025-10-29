@@ -5,8 +5,70 @@
     <title>About — Vinyl Tech</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body.products-page {
+            background: linear-gradient(180deg,#faf7f4 0%, #f3efe9 100%);
+            color: #1a1a1a;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        nav { 
+            background: rgba(255,255,255,0.45);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 6px 20px rgba(10,10,10,0.05);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            backdrop-filter: blur(6px) saturate(120%);
+        }
+        .logo { color: #111; font-weight:700; letter-spacing:1px; }
+        .nav-links a { color: rgba(20,20,20,0.7); }
+        .nav-links a:hover { color: #111; }
+
+        .about-container { max-width:900px; margin:120px auto 80px; padding:0 20px; }
+        .about-panel {
+            background: #fff;
+            border-radius:12px;
+            padding:48px 44px;
+            box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+        }
+        .about-panel h1 {
+            font-family: 'Playfair Display', serif;
+            font-size:2.6rem;
+            margin:0 0 10px 0;
+            color:#0f0f0f;
+        }
+        .about-panel > p {
+            color:#5b5b5b;
+            margin-bottom:28px;
+            font-size:1.05rem;
+            line-height:1.6;
+        }
+        .info-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:18px;
+            margin-top:28px;
+        }
+        .info-box {
+            background: linear-gradient(180deg, #fafafa, #f6f6f6);
+            border: 1px solid rgba(0,0,0,0.04);
+            padding:20px;
+            border-radius:10px;
+        }
+        .info-box h4 {
+            margin-bottom:8px;
+            color:#111;
+            font-size:1.05rem;
+            font-weight:600;
+        }
+        .info-box p {
+            font-size:0.95rem;
+            color:#6b6b6b;
+            line-height:1.5;
+        }
+    </style>
 </head>
-<body>
+<body class="products-page">
     <nav>
         <div class="logo">VINYL TECH</div>
         <div class="nav-links">
@@ -16,12 +78,12 @@
         </div>
     </nav>
 
-    <main style="max-width:900px; margin:0 auto;">
-        <section class="panel" style="padding:28px; max-width:900px; margin:0 auto;">
-            <h1 style="font-weight:700; margin-bottom:8px;">About Vinyl Tech</h1>
-            <p style="color:var(--bg-deeper); margin-bottom:18px;">We craft premium turntable accessories and care kits with a minimalist aesthetic inspired by premium audio brands. Our focus is on precision, materials and presentation — keeping vinyl listening tactile and pristine.</p>
+    <main class="about-container">
+        <section class="about-panel">
+            <h1>About Vinyl Tech</h1>
+            <p>We craft premium turntable accessories and care kits with a minimalist aesthetic inspired by premium audio brands. Our focus is on precision, materials and presentation — keeping vinyl listening tactile and pristine.</p>
 
-            <section style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+            <section class="info-grid">
                 <div class="info-box">
                     <h4>Quality Components</h4>
                     <p>High-grade parts selected for durability and sonic neutrality.</p>

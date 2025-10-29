@@ -39,9 +39,9 @@ nav {
 
     /* minimalist tinted bar: subtle accent + depth */
     background: linear-gradient(180deg,
-                rgba(138,99,255,0.06) 0%,
-                rgba(90,55,180,0.04) 40%,
-                rgba(6,6,7,0.36) 100%);
+                rgba(138, 99, 255, 0.897) 0%,
+                rgba(38, 5, 120, 0.779) 40%,
+                rgb(42, 42, 95) 100%);
     border-bottom: 1px solid rgba(90,55,180,0.08);
     box-shadow: 0 6px 22px rgba(12,8,20,0.55);
 

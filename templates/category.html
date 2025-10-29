@@ -5,8 +5,58 @@
     <title>{{ title }} — Vinyl Tech</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body.products-page {
+            background: linear-gradient(180deg,#faf7f4 0%, #f3efe9 100%);
+            color: #1a1a1a;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        nav { 
+            background: rgba(255,255,255,0.45);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 6px 20px rgba(10,10,10,0.05);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            backdrop-filter: blur(6px) saturate(120%);
+        }
+        .logo { color: #111; font-weight:700; letter-spacing:1px; }
+        .nav-links a { color: rgba(20,20,20,0.7); }
+        .nav-links a:hover { color: #111; }
+
+        .products-container { max-width:1200px; margin:120px auto 80px; padding:0 20px; }
+        .product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; margin-top:18px; }
+        .product-card {
+            background: #fff;
+            border-radius:12px;
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 46px rgba(18,18,18,0.08); }
+        .product-media { width:100%; height:320px; background:#f6f6f6; display:block; object-fit:cover; }
+        .product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; }
+        .product-title { font-family: 'Playfair Display', serif; font-size:1.15rem; color:#111; margin:0; }
+        .product-meta { color:#6b6b6b; font-size:0.95rem; }
+        .product-desc { color:#5c5c5c; font-size:0.95rem; margin-top:8px; flex:1; }
+        .product-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
+        .price { font-weight:700; color:#111; font-size:1.05rem; }
+        .btn-buy {
+            background: linear-gradient(180deg,#111,#000);
+            color:#fff;
+            padding:8px 14px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+            box-shadow: 0 8px 28px rgba(17,17,17,0.12);
+        }
+        .small-meta { display:flex; gap:8px; align-items:center; color:#8a8a8a; font-size:0.9rem; }
+        @media (max-width:900px){ .product-media { height:220px; } }
+    </style>
 </head>
-<body>
+<body class="products-page">
     <nav>
         <div class="logo">VINYL TECH</div>
         <div class="nav-links">
@@ -20,10 +70,9 @@
     </nav>
 
     <main class="products-container container">
-        {% block content %}
         <header style="margin-bottom:18px;">
-            <h1 style="margin-bottom:6px;">{{ title }}</h1>
-            <p style="color:var(--muted);">Browse the {{ title|lower() }} collection. Click an item to view or order.</p>
+            <h1 style="font-family: 'Playfair Display', serif; font-size:2.6rem; margin:0 0 6px 0; color:#0f0f0f;">{{ title }}</h1>
+            <p style="color:#5b5b5b; font-size:1.05rem;">Browse the {{ title|lower() }} collection. Click an item to view or order.</p>
         </header>
 
         <section class="product-grid" aria-live="polite">
@@ -48,7 +97,6 @@
             </article>
             {% endfor %}
         </section>
-        {% endblock %}
     </main>
 </body>
 </html>
