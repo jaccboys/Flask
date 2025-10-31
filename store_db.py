@@ -46,29 +46,56 @@ CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id);
 """
 
 INITIAL_PRODUCTS = [
+    # Turntables
     ("Classic Belt-Drive Turntable", "Turntable",
      "High-fidelity belt-drive turntable with adjustable counterweight and built-in phono preamp.",
-     "https://via.placeholder.com/320x200?text=Turntable+1", 199.99, 10),
+     "/static/images/turntable1.jpg", 199.99, 12),
 
     ("Direct-Drive DJ Turntable", "Turntable",
      "Robust direct-drive motor, pitch control and slip mats for DJ performance.",
-     "https://via.placeholder.com/320x200?text=Turntable+2", 349.99, 5),
+     "/static/images/turntable2.jpg", 349.99, 8),
 
-    ("Replacement Elliptical Stylus", "Stylus",
-     "Precision elliptical stylus for clear tracking and low wear.",
-     "https://via.placeholder.com/320x200?text=Stylus+1", 49.99, 50),
+    ("Vintage Wood-Grain Turntable", "Turntable",
+     "Retro-styled turntable with walnut veneer finish and precision tonearm for warm analog sound.",
+     "/static/images/turntable3.jpg", 279.99, 5),
 
-    ("Conical Replacement Stylus", "Stylus",
-     "Durable conical stylus, great for casual listening and vinyl collections.",
-     "https://via.placeholder.com/320x200?text=Stylus+2", 29.99, 75),
+    ("Pro Reference Turntable", "Turntable",
+     "Studio-grade turntable with quartz lock motor and anti-skate for professional mastering.",
+     "/static/images/turntable4.jpg", 599.99, 3),
 
-    ("Anti-Static Cleaning & Brush Set", "Anti-Static Set",
-     "Carbon-fiber brush, cleaning solution and anti-static mat to keep records dust-free.",
-     "https://via.placeholder.com/320x200?text=Anti-Static+Set+1", 24.99, 40),
+    # Speakers
+    ("Bookshelf Speaker Pair", "Speaker",
+     "Premium bookshelf speakers with rich sound quality and silk dome tweeters.",
+     "/static/images/speaker1.jpg", 299.99, 15),
 
-    ("Complete Anti-Static Care Kit", "Anti-Static Set",
-     "Full kit with brush, sleeve, solution and static-reducing cloth.",
-     "https://via.placeholder.com/320x200?text=Anti-Static+Set+2", 39.99, 30),
+    ("Active Monitor Speakers", "Speaker",
+     "Powered studio monitors with bi-amped design for accurate frequency response.",
+     "/static/images/speaker2.jpg", 449.99, 10),
+
+    ("Floor-Standing Tower Speakers", "Speaker",
+     "Three-way floor speakers with dual woofers delivering deep bass and crystal clarity.",
+     "/static/images/speaker3.jpg", 799.99, 6),
+
+    ("Vintage Acoustic Speakers", "Speaker",
+     "Classic design speakers with mahogany cabinets and warm, natural sound signature.",
+     "/static/images/speaker4.jpg", 349.99, 7),
+
+    # Amplifiers
+    ("Integrated Amplifier", "Amplifier",
+     "High-quality integrated amplifier with phono input and 80W per channel.",
+     "/static/images/amplifier1.jpg", 449.99, 11),
+
+    ("Tube Phono Preamp", "Amplifier",
+     "Warm tube-driven phono stage with RIAA equalization for vinyl playback.",
+     "/static/images/amplifier2.jpg", 329.99, 9),
+
+    ("Class D Power Amplifier", "Amplifier",
+     "Efficient class D amplifier delivering 150W of clean power with minimal distortion.",
+     "/static/images/amplifier3.jpg", 549.99, 8),
+
+    ("Hybrid Valve Amplifier", "Amplifier",
+     "Premium hybrid design combining tube warmth with solid-state reliability.",
+     "/static/images/amplifier4.jpg", 899.99, 4),
 ]
 
 def create_db(path: str = "store.db", populate_samples: bool = True):
