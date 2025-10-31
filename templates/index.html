@@ -15,16 +15,18 @@
         }
 
         nav { 
-            background: rgba(255,255,255,0.45);
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 6px 20px rgba(10,10,10,0.05);
-            -webkit-backdrop-filter: blur(6px) saturate(120%);
-            backdrop-filter: blur(6px) saturate(120%);
+            background: linear-gradient(180deg, 
+                        rgba(255, 255, 255, 0.95) 0%,
+                        rgba(250, 247, 244, 0.98) 100%);
+            border-bottom: 1px solid rgba(139, 90, 65, 0.1);
+            box-shadow: 0 4px 16px rgba(26, 26, 26, 0.04);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            backdrop-filter: blur(10px) saturate(120%);
         }
         .logo { color: #111; font-weight:700; letter-spacing:1px; }
         .nav-links a { color: rgba(20,20,20,0.7); }
         .nav-links a:hover { color: #111; }
-
+        
         .products-container { max-width:1200px; margin:120px auto 80px; padding:0 20px; }
         .page-hero {
             display:flex;
@@ -51,7 +53,13 @@
             border-radius:8px;
             text-decoration:none;
             font-weight:600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        
         .cta-ghost {
             background: transparent;
             border: 1px solid rgba(17,17,17,0.08);
@@ -59,6 +67,12 @@
             padding:10px 16px;
             border-radius:8px;
             text-decoration:none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .cta-ghost:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            border-color: rgba(17,17,17,0.15);
         }
 
         .search-bar {
@@ -74,32 +88,142 @@
         .search-bar input { border:0; outline:0; background:transparent; font-size:0.95rem; color:#1a1a1a; width:100%; }
 
         /* Horizontal category panels */
-        .category-panel { overflow:hidden; border-radius:12px; padding:0; display:block; }
+        .category-panel { 
+            overflow:hidden; 
+            border-radius:12px; 
+            padding:0; 
+            display:block;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
         .category-inner { display:grid; grid-template-columns:repeat(2,1fr); gap:0; align-items:stretch; }
         .category-media { min-height:420px; background:#f6f6f6; display:flex; align-items:center; justify-content:center; }
-        .category-content { padding:48px 44px; display:flex; flex-direction:column; gap:18px; justify-content:center; }
+        .category-content { 
+            padding:48px 44px; 
+            display:flex; 
+            flex-direction:column; 
+            gap:18px; 
+            justify-content:center;
+            background: #fff;
+        }
 
         /* Featured grid (small samples row) */
         .featured-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-top:1rem; }
         .featured-card {
-            border-radius:10px; overflow:hidden; background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-            border:1px solid rgba(255,255,255,0.03);
+            border-radius:10px; 
+            overflow:hidden; 
+            background: #fff;
+            border:1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .featured-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(20,20,20,0.08);
         }
         .featured-card img { width:100%; height:180px; object-fit:cover; display:block; }
-        .featured-card .card-body { padding:12px 14px; }
-        .featured-card h3 { margin-bottom:6px; font-size:1.05rem; color:#111; }
+        .featured-card .card-body { padding:16px 18px; }
+        .featured-card h3 { margin-bottom:6px; font-size:1.05rem; color:#111; font-weight:600; }
         .featured-card p { color:#6b6b6b; font-size:0.95rem; }
+        .featured-card .kv {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-top:10px;
+        }
+        .featured-card .tag {
+            background: linear-gradient(180deg, #fafafa, #f6f6f6);
+            border: 1px solid rgba(0,0,0,0.04);
+            padding:4px 10px;
+            border-radius:6px;
+            font-size:0.85rem;
+            color:#5b5b5b;
+        }
 
         @media (max-width:900px){
             .page-hero { flex-direction:column; align-items:flex-start; gap:16px; }
             .category-inner { grid-template-columns: 1fr; }
             .category-media { min-height:240px; }
         }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%) !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode nav {
+            background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(20,20,20,0.98) 100%) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        
+        body.dark-mode .logo,
+        body.dark-mode .nav-links a,
+        body.dark-mode .hero-copy h1,
+        body.dark-mode .hero-copy p,
+        body.dark-mode h2,
+        body.dark-mode h3 {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .nav-links a {
+            color: rgba(255,255,255,0.7) !important;
+        }
+        
+        body.dark-mode .nav-links a:hover {
+            color: #fff !important;
+        }
+        
+        body.dark-mode .cta-primary {
+            background: #fff !important;
+            color: #111 !important;
+        }
+        
+        body.dark-mode .cta-ghost {
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .search-bar {
+            background: rgba(40,40,40,0.9) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+        }
+        
+        body.dark-mode .search-bar input {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .category-panel,
+        body.dark-mode .featured-card {
+            background: rgba(30,30,30,0.8) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+        }
+        
+        body.dark-mode .category-content {
+            background: rgba(30,30,30,0.8) !important;
+        }
+        
+        body.dark-mode .category-media {
+            background: rgba(20,20,20,0.8) !important;
+        }
+        
+        body.dark-mode .featured-card h3,
+        body.dark-mode .featured-card p {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .featured-card .tag {
+            background: rgba(50,50,50,0.8) !important;
+            color: #b0b0b0 !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+        }
     </style>
 </head>
 <body class="products-page">
     <nav>
-        <div class="logo">VINYL TECH</div>
+        <div class="logo">PRISM AUDIO</div>
         <div class="nav-links">
             <a href="{{ url_for('home') }}">Home</a>
             <a href="{{ url_for('products') }}">Products</a>
@@ -107,6 +231,9 @@
             <a href="{{ url_for('speakers') }}">Speakers</a>
             <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
             <a href="{{ url_for('about') }}">About</a>
+            <button id="darkModeToggle" style="background: rgba(17,17,17,0.08); border: 1px solid rgba(0,0,0,0.1); padding: 10px 14px; border-radius: 8px; cursor: pointer; color: #111; font-weight: 600; margin-left: 1rem; transition: all 0.3s ease, transform 0.2s ease; font-size: 1.2rem;">
+                ☾
+            </button>
         </div>
     </nav>
 
@@ -207,5 +334,50 @@
             </div>
         </section>
     </main>
+    
+    <script>
+        const toggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved preference
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            enableDarkMode();
+        }
+        
+        toggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode')) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        });
+        
+        toggle.addEventListener('mouseenter', () => {
+            toggle.style.transform = 'translateY(-3px)';
+        });
+        
+        toggle.addEventListener('mouseleave', () => {
+            toggle.style.transform = 'translateY(0)';
+        });
+        
+        function enableDarkMode() {
+            body.classList.add('dark-mode');
+            toggle.innerHTML = '☾';
+            toggle.style.background = 'rgba(255,255,255,0.15)';
+            toggle.style.border = '1px solid rgba(255,255,255,0.2)';
+            toggle.style.color = '#fff';
+            localStorage.setItem('darkMode', 'enabled');
+        }
+        
+        function disableDarkMode() {
+            body.classList.remove('dark-mode');
+            toggle.innerHTML = '☾';
+            toggle.style.background = 'rgba(17,17,17,0.08)';
+            toggle.style.border = '1px solid rgba(0,0,0,0.1)';
+            toggle.style.color = '#111';
+            localStorage.setItem('darkMode', null);
+        }
+    </script>
 </body>
 </html>
