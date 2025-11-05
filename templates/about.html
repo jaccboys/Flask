@@ -21,147 +21,10 @@
             box-shadow: 0 4px 16px rgba(26, 26, 26, 0.04);
             -webkit-backdrop-filter: blur(10px) saturate(120%);
             backdrop-filter: blur(10px) saturate(120%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.25rem 3rem;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 100;
         }
-        
-        .logo { 
-            color: #111; 
-            font-weight:700; 
-            letter-spacing:1px; 
-            font-size: 1.3rem;
-            text-align: center;
-        }
-        
-        /* Hamburger menu button */
-        .menu-toggle {
-            position: fixed;
-            top: 1.5rem;
-            right: 3rem;
-            z-index: 1001;
-            background: rgba(17,17,17,0.08);
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 40px;
-            height: 40px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .menu-toggle span {
-            width: 24px;
-            height: 2px;
-            background: #111;
-            transition: all 0.3s ease;
-            border-radius: 2px;
-        }
-        
-        .menu-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-        
-        .menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
-        }
-        
-        /* Side menu */
-        .nav-links {
-            position: fixed;
-            top: 0;
-            right: -350px;
-            width: 350px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: -4px 0 24px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            padding: 100px 40px 40px 40px;
-            gap: 8px;
-        }
-        
-        .nav-links.active {
-            right: 0;
-        }
-        
-        .nav-links a {
-            color: rgba(20,20,20,0.7);
-            text-decoration: none;
-            padding: 16px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-        
-        .nav-links a:hover {
-            color: #111;
-            background: rgba(17,17,17,0.05);
-            transform: translateX(-4px);
-        }
-        
-        /* Dark mode toggle in menu */
-        #darkModeToggle {
-            background: rgba(17,17,17,0.08);
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #111;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-            text-align: left;
-        }
-        
-        #darkModeToggle:hover {
-            background: rgba(17,17,17,0.12);
-            transform: translateX(-4px);
-        }
-        
-        /* Overlay */
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0,0,0,0);
-            z-index: 999;
-            pointer-events: none;
-            transition: background 0.4s ease;
-        }
-        
-        .menu-overlay.active {
-            background: rgba(0,0,0,0.3);
-            pointer-events: all;
-        }
+        .logo { color: #111; font-weight:700; letter-spacing:1px; }
+        .nav-links a { color: rgba(20,20,20,0.7); }
+        .nav-links a:hover { color: #111; }
 
         .about-container { max-width:900px; margin:120px auto 80px; padding:0 20px; }
         .about-panel {
@@ -217,22 +80,9 @@
             border-bottom: 1px solid rgba(255,255,255,0.1) !important;
         }
         
-        body.dark-mode .logo {
+        body.dark-mode .logo,
+        body.dark-mode .nav-links a {
             color: #e0e0e0 !important;
-        }
-        
-        body.dark-mode .menu-toggle {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        body.dark-mode .menu-toggle span {
-            background: #fff;
-        }
-        
-        body.dark-mode .nav-links {
-            background: rgba(30,30,30,0.98);
-            box-shadow: -4px 0 24px rgba(0,0,0,0.5);
         }
         
         body.dark-mode .nav-links a {
@@ -241,44 +91,50 @@
         
         body.dark-mode .nav-links a:hover {
             color: #fff !important;
-            background: rgba(255,255,255,0.1);
         }
         
-        body.dark-mode #darkModeToggle {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
+        body.dark-mode .about-panel {
+            background: rgba(30,30,30,0.8) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
         }
         
-        body.dark-mode #darkModeToggle:hover {
-            background: rgba(255,255,255,0.2);
+        body.dark-mode .about-panel h1 {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .about-panel > p {
+            color: #b0b0b0 !important;
+        }
+        
+        body.dark-mode .info-box {
+            background: rgba(40,40,40,0.8) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        
+        body.dark-mode .info-box h4 {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .info-box p {
+            color: #b0b0b0 !important;
         }
     </style>
 </head>
 <body class="products-page">
     <nav>
         <div class="logo">VINYL TECH</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('turntables') }}">Turntables</a>
+            <a href="{{ url_for('speakers') }}">Speakers</a>
+            <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <button id="darkModeToggle" style="background: rgba(17,17,17,0.08); border: 1px solid rgba(0,0,0,0.1); padding: 10px 14px; border-radius: 8px; cursor: pointer; color: #111; font-weight: 600; margin-left: 1rem; transition: all 0.3s ease, transform 0.2s ease; font-size: 1.2rem;">
+                ☾
+            </button>
+        </div>
     </nav>
-    
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-    
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <div class="nav-links" id="navMenu">
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('products') }}">Products</a>
-        <a href="{{ url_for('turntables') }}">Turntables</a>
-        <a href="{{ url_for('speakers') }}">Speakers</a>
-        <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <button id="darkModeToggle">
-            ☾ Dark Mode
-        </button>
-    </div>
 
     <main class="about-container">
         <section class="about-panel">
@@ -303,34 +159,8 @@
     </main>
     
     <script>
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.getElementById('navMenu');
-        const menuOverlay = document.getElementById('menuOverlay');
         const toggle = document.getElementById('darkModeToggle');
         const body = document.body;
-        
-        // Menu toggle functionality
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navMenu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        });
-        
-        // Close menu when clicking overlay
-        menuOverlay.addEventListener('click', () => {
-            menuToggle.classList.remove('active');
-            navMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-        
-        // Close menu when clicking a link
-        navMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                menuToggle.classList.remove('active');
-                navMenu.classList.remove('active');
-                menuOverlay.classList.remove('active');
-            });
-        });
         
         // Check for saved preference
         const darkMode = localStorage.getItem('darkMode');
@@ -346,15 +176,29 @@
             }
         });
         
+        toggle.addEventListener('mouseenter', () => {
+            toggle.style.transform = 'translateY(-3px)';
+        });
+        
+        toggle.addEventListener('mouseleave', () => {
+            toggle.style.transform = 'translateY(0)';
+        });
+        
         function enableDarkMode() {
             body.classList.add('dark-mode');
-            toggle.innerHTML = '☀ Light Mode';
+            toggle.innerHTML = '☾';
+            toggle.style.background = 'rgba(255,255,255,0.15)';
+            toggle.style.border = '1px solid rgba(255,255,255,0.2)';
+            toggle.style.color = '#fff';
             localStorage.setItem('darkMode', 'enabled');
         }
         
         function disableDarkMode() {
             body.classList.remove('dark-mode');
-            toggle.innerHTML = '☾ Dark Mode';
+            toggle.innerHTML = '☾';
+            toggle.style.background = 'rgba(17,17,17,0.08)';
+            toggle.style.border = '1px solid rgba(0,0,0,0.1)';
+            toggle.style.color = '#111';
             localStorage.setItem('darkMode', null);
         }
     </script>
