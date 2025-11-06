@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><title>Sign up — Prism Audio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- ...existing code... (reuse the same <style> block from login.html) -->
+  <style>
+    /* ...existing code... */
+  </style>
+</head>
+<body class="products-page">
+  <nav><div class="logo">PRISM AUDIO</div></nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <div class="nav-links" id="navMenu">
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('products') }}">Products</a>
+    <a href="{{ url_for('turntables') }}">Turntables</a>
+    <a href="{{ url_for('speakers') }}">Speakers</a>
+    <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+    <a href="{{ url_for('about') }}">About</a>
+    {% if session.get('user_id') %}
+      <a href="{{ url_for('account') }}">My Account</a>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    {% else %}
+      <a class="cta-primary" href="{{ url_for('login') }}">Log in</a>
+      <a class="cta-ghost" href="{{ url_for('signup') }}">Sign up</a>
+    {% endif %}
+    <button id="darkModeToggle">☾ Dark Mode</button>
+  </div>
+
+  <main class="container">
+    <div class="auth-wrap">
+      <div class="auth-card" role="region" aria-label="Sign up">
+        <h1>Create account</h1>
+        {% with msgs = get_flashed_messages(with_categories=true) %}
+          {% if msgs %}{% for cat,msg in msgs %}<div class="flash">{{ msg }}</div>{% endfor %}{% endif %}
+        {% endwith %}
+        <form method="post" autocomplete="on">
+          <input name="first_name" placeholder="First name" required>
+          <input name="last_name" placeholder="Last name" required>
+          <input name="email" type="email" placeholder="Email" required>
+          <input name="password" type="password" placeholder="Password" required>
+          <button class="btn-primary" type="submit">Sign up</button>
+        </form>
+        <p class="muted" style="margin-top:10px;">Have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ...existing code... (reuse the same script block from login.html)
+  </script>
+</body>
+</html>

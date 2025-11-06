@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS customers (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
     phone TEXT,
     address_line1 TEXT,
     address_line2 TEXT,

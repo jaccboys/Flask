@@ -126,6 +126,39 @@
             transform: translateX(-4px);
         }
         
+        /* Ensure action buttons inside sidebar are distinct */
+        .nav-links a.cta-primary {
+            background:#111;
+            color:#fff;
+            font-weight:600;
+            text-align:center;
+        }
+        .nav-links a.cta-ghost {
+            border:1px solid rgba(17,17,17,0.12);
+            text-align:center;
+        }
+
+        /* Dark mode overrides keep login text readable */
+        body.dark-mode .nav-links a.cta-primary {
+            background:#fff !important;
+            color:#111 !important;
+            box-shadow:0 0 0 1px rgba(255,255,255,0.15);
+        }
+        body.dark-mode .nav-links a.cta-ghost {
+            border:1px solid rgba(255,255,255,0.25) !important;
+            color:#e0e0e0 !important;
+        }
+
+        /* Optional: add subtle hover */
+        .nav-links a.cta-primary:hover,
+        body.dark-mode .nav-links a.cta-primary:hover {
+            transform:translateY(-2px);
+        }
+        .nav-links a.cta-ghost:hover,
+        body.dark-mode .nav-links a.cta-ghost:hover {
+            transform:translateY(-2px);
+        }
+
         /* Dark mode toggle in menu */
         #darkModeToggle {
             background: rgba(17,17,17,0.08);
@@ -414,6 +447,15 @@
         <a href="{{ url_for('speakers') }}">Speakers</a>
         <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
         <a href="{{ url_for('about') }}">About</a>
+
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('account') }}">My Account</a>
+            <a href="{{ url_for('logout') }}">Log out</a>
+        {% else %}
+            <a class="cta-primary" href="{{ url_for('login') }}">Log in</a>
+            <a class="cta-ghost" href="{{ url_for('signup') }}">Sign up</a>
+        {% endif %}
+
         <button id="darkModeToggle">
             ☾ Dark Mode
         </button>
