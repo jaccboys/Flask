@@ -5,14 +5,133 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-  <!-- ...existing code... (reuse the same <style> block from login.html) -->
   <style>
-    /* ...existing code... */
+    /* Copy of index page visual system */
+    body.products-page {
+      background: linear-gradient(180deg,#faf7f4 0%, #f3efe9 100%);
+      color: #1a1a1a;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    nav { 
+      background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(250,247,244,0.98) 100%);
+      border-bottom: 1px solid rgba(139, 90, 65, 0.1);
+      box-shadow: 0 4px 16px rgba(26, 26, 26, 0.04);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      backdrop-filter: blur(10px) saturate(120%);
+      display: flex; justify-content: center; align-items: center;
+      padding: 1.25rem 3rem; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 100;
+    }
+    .logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.3rem; text-align:center; }
+
+    /* Hamburger */
+    .menu-toggle {
+      position: fixed; top: 1.5rem; right: 3rem; z-index: 1001;
+      background: rgba(17,17,17,0.08); border: 1px solid rgba(0,0,0,0.1);
+      padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+      display: flex; flex-direction: column; gap: 5px; width: 40px; height: 40px; justify-content: center; align-items: center;
+    }
+    .menu-toggle span { width: 24px; height: 2px; background: #111; transition: all 0.3s ease; border-radius: 2px; }
+    .menu-toggle:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+    /* Sidebar */
+    .nav-links {
+      position: fixed; top: 0; right: -350px; width: 350px; height: 100vh;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(20px);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.1); z-index:1000; transition: right .4s cubic-bezier(.4,0,.2,1);
+      display:flex; flex-direction:column; padding:100px 40px 40px; gap:8px;
+    }
+    .nav-links.active { right:0; }
+    .nav-links a {
+      color: rgba(20,20,20,0.7); text-decoration:none; padding:16px 20px;
+      border-radius:8px; transition: all .3s ease; font-size:1.1rem; font-weight:500;
+    }
+    .nav-links a:hover { color:#111; background:rgba(17,17,17,0.05); transform: translateX(-4px); }
+
+    /* CTA styles (same as index) */
+    .nav-links a.cta-primary { background:#111; color:#fff; font-weight:600; text-align:center; }
+    .nav-links a.cta-ghost { border:1px solid rgba(17,17,17,0.12); text-align:center; }
+    .nav-links a.cta-primary:hover { transform:translateY(-2px); }
+    .nav-links a.cta-ghost:hover { transform:translateY(-2px); }
+
+    /* Dark mode button */
+    #darkModeToggle {
+      background: rgba(17,17,17,0.08); border: 1px solid rgba(0,0,0,0.1);
+      padding: 12px 20px; border-radius: 8px; cursor: pointer; color: #111; font-weight: 600;
+      margin-top: 20px; transition: all 0.3s ease; font-size: 1.1rem; text-align: left;
+    }
+    #darkModeToggle:hover { background: rgba(17,17,17,0.12); transform: translateX(-4px); }
+
+    /* Overlay */
+    .menu-overlay {
+      position: fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0);
+      z-index:999; pointer-events:none; transition: background .4s ease;
+    }
+    .menu-overlay.active { background: rgba(0,0,0,0.3); pointer-events: all; }
+
+    /* Page container */
+    .products-container { max-width:1200px; margin:120px auto 80px; padding:0 20px; }
+
+    /* Auth card */
+    .auth-wrap { display:flex; justify-content:center; }
+    .auth-card {
+      width:100%; max-width:520px; background:#fff; border-radius:12px;
+      padding:32px 30px; box-shadow:0 10px 30px rgba(20,20,20,0.06);
+      border:1px solid rgba(0,0,0,0.06);
+    }
+    .auth-card h1 { font-family:'Playfair Display', serif; font-size:2.1rem; margin:0 0 16px; color:#0f0f0f; line-height:1.05; }
+    .auth-card form { display:flex; flex-direction:column; gap:14px; }
+    .auth-card input {
+      background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:8px;
+      padding:12px; font-size:1rem;
+    }
+    .cta-primary {
+      background:#111; color:#fff; padding:12px 16px; border-radius:8px; font-weight:600;
+      border:0; cursor:pointer; font-size:1rem; transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .cta-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+    .muted { color:#6b6b6b; font-size:.95rem; }
+
+    /* Dark mode (same rules as index) */
+    body.dark-mode {
+      background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%) !important;
+      color: #e0e0e0 !important;
+    }
+    body.dark-mode nav {
+      background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(20,20,20,0.98) 100%) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    body.dark-mode .menu-toggle { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); }
+    body.dark-mode .menu-toggle span { background: #fff; }
+    body.dark-mode .nav-links { background: rgba(30,30,30,0.98); box-shadow: -4px 0 24px rgba(0,0,0,0.5); }
+    body.dark-mode .nav-links a { color: rgba(255,255,255,0.7) !important; }
+    body.dark-mode .nav-links a:hover { color: #fff !important; background: rgba(255,255,255,0.1); }
+    body.dark-mode #darkModeToggle { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+    body.dark-mode #darkModeToggle:hover { background: rgba(255,255,255,0.2); }
+
+    /* Auth card dark mode */
+    body.dark-mode .auth-card { background: rgba(30,30,30,0.8) !important; border:1px solid rgba(255,255,255,0.1) !important; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+    body.dark-mode .auth-card h1 { color:#f5f5f5 !important; }
+    body.dark-mode .auth-card input { background: rgba(40,40,40,0.9); color:#f5f5f5; border:1px solid rgba(255,255,255,0.15); }
+    body.dark-mode .cta-primary { background:#f5f5f5 !important; color:#111 !important; }
+
+    /* Keep login/signup CTA in sidebar readable in dark mode (same as index) */
+    body.dark-mode .nav-links a.cta-primary {
+      background:#fff !important; color:#111 !important; box-shadow:0 0 0 1px rgba(255,255,255,0.15);
+    }
+    body.dark-mode .nav-links a.cta-ghost {
+      border:1px solid rgba(255,255,255,0.25) !important; color:#e0e0e0 !important;
+    }
   </style>
 </head>
 <body class="products-page">
   <nav><div class="logo">PRISM AUDIO</div></nav>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
   <div class="menu-overlay" id="menuOverlay"></div>
 
   <div class="nav-links" id="navMenu">
@@ -22,17 +141,16 @@
     <a href="{{ url_for('speakers') }}">Speakers</a>
     <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
     <a href="{{ url_for('about') }}">About</a>
+    <button id="darkModeToggle">☾ Dark Mode</button>
+    <div style="flex:1;"></div>
     {% if session.get('user_id') %}
       <a href="{{ url_for('account') }}">My Account</a>
-      <a href="{{ url_for('logout') }}">Log out</a>
     {% else %}
-      <a class="cta-primary" href="{{ url_for('login') }}">Log in</a>
-      <a class="cta-ghost" href="{{ url_for('signup') }}">Sign up</a>
+      <a href="{{ url_for('login') }}">Log in</a>
     {% endif %}
-    <button id="darkModeToggle">☾ Dark Mode</button>
   </div>
 
-  <main class="container">
+  <main class="products-container container">
     <div class="auth-wrap">
       <div class="auth-card" role="region" aria-label="Sign up">
         <h1>Create account</h1>
@@ -44,7 +162,7 @@
           <input name="last_name" placeholder="Last name" required>
           <input name="email" type="email" placeholder="Email" required>
           <input name="password" type="password" placeholder="Password" required>
-          <button class="btn-primary" type="submit">Sign up</button>
+          <button class="cta-primary" type="submit">Sign up</button>
         </form>
         <p class="muted" style="margin-top:10px;">Have an account? <a href="{{ url_for('login') }}">Log in</a></p>
       </div>
@@ -52,7 +170,21 @@
   </main>
 
   <script>
-    // ...existing code... (reuse the same script block from login.html)
+    const menuToggle=document.getElementById('menuToggle');
+    const navMenu=document.getElementById('navMenu');
+    const menuOverlay=document.getElementById('menuOverlay');
+    const toggle=document.getElementById('darkModeToggle');
+    const body=document.body;
+
+    menuToggle.addEventListener('click',()=>{menuToggle.classList.toggle('active');navMenu.classList.toggle('active');menuOverlay.classList.toggle('active');});
+    menuOverlay.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');});
+    navMenu.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');}));
+
+    const dm=localStorage.getItem('darkMode'); if(dm==='enabled'){enableDarkMode();}
+    toggle.addEventListener('click',()=>{ body.classList.contains('dark-mode') ? disableDarkMode() : enableDarkMode(); });
+
+    function enableDarkMode(){ body.classList.add('dark-mode'); toggle.innerHTML='☀ Light Mode'; localStorage.setItem('darkMode','enabled'); }
+    function disableDarkMode(){ body.classList.remove('dark-mode'); toggle.innerHTML='☾ Dark Mode'; localStorage.setItem('darkMode', null); }
   </script>
 </body>
 </html>

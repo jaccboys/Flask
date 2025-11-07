@@ -70,6 +70,12 @@
       font-family:'Playfair Display', serif; font-size:2.1rem;
       margin:0 0 16px; color:#0f0f0f; line-height:1.05;
     }
+
+    /* Make the heading readable in dark mode */
+    body.dark-mode .auth-card h1 {
+      color:#f5f5f5 !important;
+    }
+
     .auth-card form { display:flex; flex-direction:column; gap:14px; }
     .auth-card input {
       background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:8px;
@@ -95,12 +101,22 @@
     body.dark-mode .nav-links { background:rgba(30,30,30,0.98); box-shadow:-4px 0 24px rgba(0,0,0,0.5); }
     body.dark-mode .nav-links a { color:rgba(255,255,255,0.7) !important; }
     body.dark-mode .nav-links a:hover { color:#fff !important; background:rgba(255,255,255,0.1); }
-    body.dark-mode .nav-links a.cta-primary { background:#fff !important; color:#111 !important; }
-    body.dark-mode .nav-links a.cta-ghost { border:1px solid rgba(255,255,255,0.25) !important; color:#e0e0e0 !important; }
-    body.dark-mode #darkModeToggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); color:#fff; }
+
+    /* FIX: make login button text readable in dark mode */
+    body.dark-mode .btn-primary {
+      background:#111 !important;
+      color:#fff !important;
+    }
+
+    /* Optional: make the sidebar Login link readable too */
+    body.dark-mode .nav-links a.cta-primary {
+      background:rgba(255,255,255,0.12) !important;
+      color:#fff !important;
+      border:1px solid rgba(255,255,255,0.25);
+    }
+
     body.dark-mode .auth-card { background:rgba(30,30,30,0.8) !important; border:1px solid rgba(255,255,255,0.1) !important; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
     body.dark-mode .auth-card input { background:rgba(40,40,40,0.9); color:#f5f5f5; border:1px solid rgba(255,255,255,0.15); }
-    body.dark-mode .btn-primary { background:#f5f5f5; color:#111; }
   </style>
 </head>
 <body class="products-page">
@@ -119,14 +135,13 @@
     <a href="{{ url_for('speakers') }}">Speakers</a>
     <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
     <a href="{{ url_for('about') }}">About</a>
+    <button id="darkModeToggle">☾ Dark Mode</button>
+    <div style="flex:1;"></div>
     {% if session.get('user_id') %}
       <a href="{{ url_for('account') }}">My Account</a>
-      <a href="{{ url_for('logout') }}">Log out</a>
     {% else %}
-      <a class="cta-primary" href="{{ url_for('login') }}">Log in</a>
-      <a class="cta-ghost" href="{{ url_for('signup') }}">Sign up</a>
+      <a href="{{ url_for('login') }}">Log in</a>
     {% endif %}
-    <button id="darkModeToggle">☾ Dark Mode</button>
   </div>
 
   <main class="container">

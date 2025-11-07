@@ -113,19 +113,25 @@
 </head>
 <body class="products-page">
     <nav>
-        <div class="logo">VINYL TECH</div>
-        <div class="nav-links">
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('products') }}">All Products</a>
-            <a href="{{ url_for('turntables') }}">Turntables</a>
-            <a href="{{ url_for('speakers') }}">Speakers</a>
-            <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
-            <a href="{{ url_for('about') }}">About</a>
-            <button id="darkModeToggle" style="background: rgba(17,17,17,0.08); border: 1px solid rgba(0,0,0,0.1); padding: 10px 14px; border-radius: 8px; cursor: pointer; color: #111; font-weight: 600; margin-left: 1rem; transition: all 0.3s ease, transform 0.2s ease; font-size: 1.2rem;">
-                ☾
-            </button>
-        </div>
+        <div class="logo">PRISM AUDIO</div>
     </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="nav-links" id="navMenu">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('turntables') }}">Turntables</a>
+        <a href="{{ url_for('speakers') }}">Speakers</a>
+        <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <button id="darkModeToggle">☾ Dark Mode</button>
+        <div style="flex:1;"></div>
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('account') }}">My Account</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Log in</a>
+        {% endif %}
+    </div>
 
     <main class="products-container container">
         <header style="margin-bottom:18px;">
@@ -158,48 +164,18 @@
     </main>
     
     <script>
-        const toggle = document.getElementById('darkModeToggle');
-        const body = document.body;
-        
-        // Check for saved preference
-        const darkMode = localStorage.getItem('darkMode');
-        if (darkMode === 'enabled') {
-            enableDarkMode();
-        }
-        
-        toggle.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
-        });
-        
-        toggle.addEventListener('mouseenter', () => {
-            toggle.style.transform = 'translateY(-3px)';
-        });
-        
-        toggle.addEventListener('mouseleave', () => {
-            toggle.style.transform = 'translateY(0)';
-        });
-        
-        function enableDarkMode() {
-            body.classList.add('dark-mode');
-            toggle.innerHTML = '☾';
-            toggle.style.background = 'rgba(255,255,255,0.15)';
-            toggle.style.border = '1px solid rgba(255,255,255,0.2)';
-            toggle.style.color = '#fff';
-            localStorage.setItem('darkMode', 'enabled');
-        }
-        
-        function disableDarkMode() {
-            body.classList.remove('dark-mode');
-            toggle.innerHTML = '☾';
-            toggle.style.background = 'rgba(17,17,17,0.08)';
-            toggle.style.border = '1px solid rgba(0,0,0,0.1)';
-            toggle.style.color = '#111';
-            localStorage.setItem('darkMode', null);
-        }
+      const menuToggle=document.getElementById('menuToggle');
+      const navMenu=document.getElementById('navMenu');
+      const menuOverlay=document.getElementById('menuOverlay');
+      const toggle=document.getElementById('darkModeToggle');
+      const body=document.body;
+      menuToggle.addEventListener('click',()=>{menuToggle.classList.toggle('active');navMenu.classList.toggle('active');menuOverlay.classList.toggle('active');});
+      menuOverlay.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');});
+      navMenu.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');}));
+      const dm=localStorage.getItem('darkMode'); if(dm==='enabled'){enableDarkMode();}
+      toggle.addEventListener('click',()=>{body.classList.contains('dark-mode')?disableDarkMode():enableDarkMode();});
+      function enableDarkMode(){ body.classList.add('dark-mode'); toggle.innerHTML='☀ Light Mode'; localStorage.setItem('darkMode','enabled'); }
+      function disableDarkMode(){ body.classList.remove('dark-mode'); toggle.innerHTML='☾ Dark Mode'; localStorage.setItem('darkMode',null); }
     </script>
 </body>
 </html>
