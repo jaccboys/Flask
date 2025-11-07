@@ -146,5 +146,10 @@ def amplifiers():
     items = fetch_products_by_category("Amplifier")
     return render_template("category.html", title="Amplifiers", items=items)
 
+@app.route("/test")
+def test_page():
+    # Provide an empty samples dict; the template handles missing samples.
+    return render_template("index_test.html", samples={})
+
 if __name__ == "__main__":
     app.run(debug=True)
