@@ -3,6 +3,7 @@ import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from werkzeug.utils import secure_filename  # NEW
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET", "dev-secret-change-me")
@@ -10,9 +11,16 @@ app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET", "dev-secret-change-me"
 BASE_DIR = os.path.dirname(__file__)
 DB_PATH = os.path.join(BASE_DIR, "store.db")
 
+# NEW: simple upload config
+app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "static", "images")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    # Ensure FK behavior during deletes/updates
+    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 def login_required(view):
@@ -151,5 +159,125 @@ def test_page():
     # Provide an empty samples dict; the template handles missing samples.
     return render_template("index_test.html", samples={})
 
+# NEW: helpers for image upload
+def allowed_file(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image_from_request(file_storage):
+    if not file_storage or not file_storage.filename:
+        return None
+    if not allowed_file(file_storage.filename):
+        return None
+    filename = secure_filename(file_storage.filename)
+    base, ext = os.path.splitext(filename)
+    dest = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    i = 1
+    while os.path.exists(dest):
+        filename = f"{base}-{i}{ext}"
+        dest = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        i += 1
+    file_storage.save(dest)
+    return f"/static/images/{filename}"
+
+@app.route("/admin", methods=["GET"])
+def admin_page():
+    # TODO: add authentication later
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, name, sku, category, description, price, stock, image FROM products ORDER BY id"
+        ).fetchall()
+    categories = ["Turntable", "Speaker", "Amplifier"]
+    return render_template("admin.html", products=[dict(r) for r in rows], categories=categories)
+
+@app.post("/admin/product/create")
+def admin_create_product():
+    name = request.form.get("name", "").strip()
+    sku = request.form.get("sku", "").strip() or None
+    category = request.form.get("category", "").strip()
+    description = request.form.get("description", "").strip()
+    price_raw = request.form.get("price", "").strip()
+    stock_raw = request.form.get("stock", "").strip()
+    image_url = request.form.get("image_url", "").strip()
+    image_file = request.files.get("image_file")
+
+    try:
+        price = float(price_raw)
+        stock = int(stock_raw or 0)
+    except ValueError:
+        flash("Price and stock must be numeric.", "error")
+        return redirect(url_for("admin_page"))
+
+    if not name or not category:
+        flash("Name and category are required.", "error")
+        return redirect(url_for("admin_page"))
+
+    image_path = save_image_from_request(image_file) or (image_url or None)
+
+    try:
+        with get_db() as conn:
+            conn.execute(
+                """INSERT INTO products (name, sku, category, description, price, stock, image)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (name, sku, category, description, price, stock, image_path),
+            )
+            conn.commit()
+        flash("Product created.", "success")
+    except sqlite3.IntegrityError as e:
+        flash(f"Error creating product: {e}", "error")
+
+    return redirect(url_for("admin_page"))
+
+@app.post("/admin/product/<int:product_id>/update")
+def admin_update_product(product_id: int):
+    name = request.form.get("name", "").strip()
+    sku = request.form.get("sku", "").strip() or None
+    category = request.form.get("category", "").strip()
+    description = request.form.get("description", "").strip()
+    price_raw = request.form.get("price", "").strip()
+    stock_raw = request.form.get("stock", "").strip()
+    image_url = request.form.get("image_url", "").strip()
+    image_file = request.files.get("image_file")
+
+    try:
+        price = float(price_raw)
+        stock = int(stock_raw or 0)
+    except ValueError:
+        flash("Price and stock must be numeric.", "error")
+        return redirect(url_for("admin_page"))
+
+    with get_db() as conn:
+        current = conn.execute("SELECT image FROM products WHERE id = ?", (product_id,)).fetchone()
+        if not current:
+            flash("Product not found.", "error")
+            return redirect(url_for("admin_page"))
+
+        new_image = save_image_from_request(image_file) or (image_url if image_url else current["image"])
+
+        try:
+            conn.execute(
+                """UPDATE products
+                   SET name=?, sku=?, category=?, description=?, price=?, stock=?, image=?
+                   WHERE id=?""",
+                (name, sku, category, description, price, stock, new_image, product_id),
+            )
+            conn.commit()
+            flash("Product updated.", "success")
+        except sqlite3.IntegrityError as e:
+            flash(f"Error updating product: {e}", "error")
+
+    return redirect(url_for("admin_page"))
+
+@app.post("/admin/product/<int:product_id>/delete")
+def admin_delete_product(product_id: int):
+    try:
+        with get_db() as conn:
+            conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
+            conn.commit()
+        flash("Product deleted.", "success")
+    except sqlite3.IntegrityError:
+        flash("Cannot delete product because it is referenced by existing orders.", "error")
+    return redirect(url_for("admin_page"))
+
+# Start the dev server when running this file directly
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="127.0.0.1", port=5000)

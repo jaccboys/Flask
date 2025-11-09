@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin — Products</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:#f2efea; color:#111; }
+    nav { position:sticky; top:0; padding:16px 24px; background:#fff; border-bottom:1px solid rgba(0,0,0,0.10); z-index:10; }
+    .logo { font-weight:700; text-align:center; color:#1a73e8; } /* changed color */
+    /* Back-to-home button */
+    a.btn { text-decoration:none; display:inline-block; }
+    .btn.link { background:#fff; color:#111; border:1px solid rgba(0,0,0,0.2); padding:8px 12px; border-radius:8px; font-weight:600; }
+    .btn.link:hover { background:#111; color:#fff; }
+    .back-home { position:absolute; right:16px; top:10px; } /* moved to right */
+    .container { max-width:1200px; margin:24px auto; padding:0 20px; }
+    h1,h2 { font-family:'Playfair Display', serif; margin:10px 0 16px; }
+
+    .card { background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.08); padding:20px; }
+
+    /* Reusable fields grid */
+    .fields { display:grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap:14px 16px; align-items:start; }
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: 1 / -1; }
+
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:0.85rem; color:#333; font-weight:600; }
+    .field input[type="text"],
+    .field input[type="number"],
+    .field select,
+    .field textarea {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid rgba(0,0,0,0.25);
+      border-radius:8px;
+      background:#fff;
+      color:#111;
+      font-size:0.95rem;
+    }
+    .field textarea { min-height:110px; resize:vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline:2px solid #1a73e8; border-color:#1a73e8; }
+
+    /* Product row layout: thumbnail + fields grid */
+    .product-form { display:grid; grid-template-columns: 120px 1fr; gap:16px; align-items:start; border-top:1px solid rgba(0,0,0,0.06); padding-top:16px; margin-top:16px; }
+    .thumb { width:120px; height:90px; object-fit:cover; border-radius:10px; background:#e9e9e9; border:1px solid rgba(0,0,0,0.15); }
+
+    .actions { display:flex; gap:10px; align-items:center; }
+    .btn { background:#111; color:#fff; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .btn:hover { background:#000; }
+    .btn.danger { background:#c62828; }
+    .btn.danger:hover { background:#b71c1c; }
+
+    .flash { padding:12px 16px; border-radius:10px; margin-bottom:14px; font-size:0.9rem; font-weight:500; }
+    .flash.error { background:#ffe4e4; color:#680000; border:1px solid #ffb3b3; }
+    .flash.success { background:#e4f7ea; color:#0d5f26; border:1px solid #b8e6c5; }
+
+    @media (max-width:900px){
+      .fields { grid-template-columns: 1fr 1fr; }
+      .product-form { grid-template-columns: 90px 1fr; }
+      .thumb { width:90px; height:90px; }
+      .span-3, .span-4 { grid-column: 1 / -1; }
+    }
+    @media (max-width:560px){
+      .fields { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{{ url_for('home') }}" class="btn link back-home">← Home</a>
+    <div class="logo">PRISM AUDIO — Admin</div>
+  </nav>
+  <main class="container">
+    <h1>Products Admin</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Create -->
+    <section class="card">
+      <h2>Create new product</h2>
+      <form action="{{ url_for('admin_create_product') }}" method="post" enctype="multipart/form-data">
+        <div class="fields">
+          <div class="field span-2">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="e.g. Classic Belt-Drive Turntable" required>
+          </div>
+          <div class="field">
+            <label>SKU</label>
+            <input type="text" name="sku" placeholder="Optional">
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select name="category" required>
+              <option value="" disabled selected>Select category</option>
+              {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label>Price</label>
+            <input type="number" name="price" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="field">
+            <label>Stock</label>
+            <input type="number" name="stock" step="1" value="0">
+          </div>
+          <div class="field span-3">
+            <label>Image URL</label>
+            <input type="text" name="image_url" placeholder="/static/images/turntable1.jpg">
+          </div>
+          <div class="field">
+            <label>Upload Image</label>
+            <input type="file" name="image_file" accept="image/*">
+          </div>
+          <div class="field span-4">
+            <label>Description</label>
+            <textarea name="description" placeholder="Short, helpful description"></textarea>
+          </div>
+          <div class="actions span-4">
+            <button class="btn" type="submit">Create</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- List + edit -->
+    <section class="card" style="margin-top:16px;">
+      <h2>All products</h2>
+
+      {% for p in products %}
+        <form class="product-form" action="{{ url_for('admin_update_product', product_id=p.id) }}" method="post" enctype="multipart/form-data">
+          <img class="thumb" src="{{ p.image or '' }}" alt="" onerror="this.style.visibility='hidden'">
+
+          <div class="fields">
+            <div class="field span-2">
+              <label>Name</label>
+              <input type="text" name="name" value="{{ p.name }}" required>
+            </div>
+
+            <div class="field">
+              <label>SKU</label>
+              <input type="text" name="sku" value="{{ p.sku or '' }}">
+            </div>
+
+            <div class="field">
+              <label>Category</label>
+              <select name="category" required>
+                {% for c in categories %}
+                  <option value="{{ c }}" {% if c == p.category %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Price</label>
+              <input type="number" name="price" step="0.01" value="{{ '%.2f'|format(p.price) }}" required>
+            </div>
+
+            <div class="field">
+              <label>Stock</label>
+              <input type="number" name="stock" step="1" value="{{ p.stock }}">
+            </div>
+
+            <div class="field span-3">
+              <label>Image URL</label>
+              <input type="text" name="image_url" placeholder="/static/images/..." value="{{ p.image or '' }}">
+            </div>
+
+            <div class="field">
+              <label>Upload Image</label>
+              <input type="file" name="image_file" accept="image/*">
+            </div>
+
+            <div class="field span-4">
+              <label>Description</label>
+              <textarea name="description" rows="3">{{ p.description }}</textarea>
+            </div>
+
+            <div class="actions span-4">
+              <button class="btn" type="submit">Save</button>
+              <button class="btn danger" formaction="{{ url_for('admin_delete_product', product_id=p.id) }}" formmethod="post"
+                      onclick="return confirm('Delete this product? This cannot be undone.');">
+                Delete
+              </button>
+              <span style="margin-left:auto; color:#666;">ID #{{ p.id }}</span>
+            </div>
+          </div>
+        </form>
+      {% else %}
+        <p style="color:#666;">No products found.</p>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>
