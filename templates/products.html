@@ -240,6 +240,14 @@
 
         /* Product grid: large photography, airy cards */
         .product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; margin-top:18px; }
+        /* Keep card size consistent when 1–2 items are shown */
+        .product-grid.compact { 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 360px));
+            justify-content: center;
+        }
+        @media (max-width:700px){
+            .product-grid, .product-grid.compact { grid-template-columns: 1fr; justify-content: stretch; }
+        }
         .product-card {
             background: #fff;
             border-radius:12px;
@@ -441,8 +449,12 @@
 
             <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-end;">
                 <div class="search-bar" role="search">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden style="opacity:0.6"><path d="M21 21l-4.35-4.35" stroke="#333" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <input type="search" placeholder="Search products…" aria-label="Search products">
+                    <!-- Fixed proper magnifier icon (old path showed only a slash) -->
+                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden style="opacity:0.6">
+                        <circle cx="11" cy="11" r="7" fill="none" stroke="#333" stroke-width="1.6"/>
+                        <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#333" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <input type="search" id="productSearch" placeholder="Search products…" aria-label="Search products">
                 </div>
                 <div style="font-size:0.95rem; color:#6b6b6b;">Free returns • 2‑year warranty</div>
             </div>
@@ -455,7 +467,7 @@
 
         <section class="product-grid" aria-live="polite">
             {% for p in products %}
-            <article class="product-card" id="product-{{ p.id }}">
+            <article class="product-card" id="product-{{ p.id }}" data-name="{{ p.name|lower }}" data-category="{{ p.category|lower }}" data-description="{{ p.description|lower }}">
                 <img class="product-media" src="{{ p.image }}" alt="{{ p.name }}">
                 <div class="product-body">
                     <div>
@@ -483,22 +495,17 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const toggle = document.getElementById('darkModeToggle');
         const body = document.body;
-        
-        // Menu toggle functionality
+
         menuToggle.addEventListener('click', () => {
             menuToggle.classList.toggle('active');
             navMenu.classList.toggle('active');
             menuOverlay.classList.toggle('active');
         });
-        
-        // Close menu when clicking overlay
         menuOverlay.addEventListener('click', () => {
             menuToggle.classList.remove('active');
             navMenu.classList.remove('active');
             menuOverlay.classList.remove('active');
         });
-        
-        // Close menu when clicking a link
         navMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 menuToggle.classList.remove('active');
@@ -506,31 +513,60 @@
                 menuOverlay.classList.remove('active');
             });
         });
-        
-        // Check for saved preference
-        const darkMode = localStorage.getItem('darkMode');
-        if (darkMode === 'enabled') {
-            enableDarkMode();
-        }
-        
+
+        if (localStorage.getItem('darkMode') === 'enabled') enableDarkMode();
         toggle.addEventListener('click', () => {
-            if (body.classList.contains('dark-mode')) {
-                disableDarkMode();
-            } else {
-                enableDarkMode();
-            }
+            body.classList.contains('dark-mode') ? disableDarkMode() : enableDarkMode();
         });
-        
         function enableDarkMode() {
             body.classList.add('dark-mode');
-            toggle.innerHTML = '☀ Light Mode';
-            localStorage.setItem('darkMode', 'enabled');
+            toggle.textContent = '☀ Light Mode';
+            localStorage.setItem('darkMode','enabled');
         }
-        
         function disableDarkMode() {
             body.classList.remove('dark-mode');
-            toggle.innerHTML = '☾ Dark Mode';
-            localStorage.setItem('darkMode', null);
+            toggle.textContent = '☾ Dark Mode';
+            localStorage.removeItem('darkMode');
+        }
+
+        // --- Search by product name only ---
+        const searchInput = document.getElementById('productSearch');
+        const grid = document.querySelector('.product-grid');
+        const cards = grid ? Array.from(grid.querySelectorAll('.product-card')) : [];
+
+        const noResults = document.createElement('p');
+        noResults.id = 'noResults';
+        noResults.style.color = '#6b6b6b';
+        noResults.style.margin = '14px 0';
+        noResults.textContent = 'No products match your search.';
+        noResults.hidden = true;
+        grid.parentNode.insertBefore(noResults, grid);
+
+        // Index names once (lowercased)
+        const cardIndex = cards.map(card => {
+            const name = (card.dataset.name || card.querySelector('.product-title')?.textContent || '').toLowerCase();
+            return { el: card, name };
+        });
+
+        function filterProducts(q) {
+            q = (q || '').trim().toLowerCase();
+            let shown = 0;
+            cardIndex.forEach(({ el, name }) => {
+                const match = !q || name.includes(q);
+                el.style.display = match ? '' : 'none';
+                if (match) shown++;
+            });
+            noResults.hidden = shown !== 0;
+            grid.setAttribute('aria-label', `${shown} products shown`);
+            // Toggle compact layout for 1–2 results
+            grid.classList.toggle('compact', shown > 0 && shown < 3);
+        }
+
+        if (searchInput) {
+            ['input','change','keyup'].forEach(ev =>
+                searchInput.addEventListener(ev, e => filterProducts(e.target.value))
+            );
+            filterProducts(searchInput.value);
         }
     </script>
 </body>
