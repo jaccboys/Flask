@@ -7,9 +7,38 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
+/* Add unified sidebar/nav + dark mode (before existing item styles) */
+nav { background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,0.98)); border-bottom:1px solid rgba(139,90,65,0.1); box-shadow:0 4px 16px rgba(26,26,26,0.04); backdrop-filter:blur(10px) saturate(120%); display:flex; justify-content:center; align-items:center; padding:1.25rem 3rem; position:fixed; top:0; left:0; right:0; width:100%; z-index:100; }
+.logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.1rem; }
+.menu-toggle { position:fixed; top:1.5rem; right:3rem; z-index:1001; background:rgba(17,17,17,0.08); border:1px solid rgba(0,0,0,0.1); padding:12px; border-radius:8px; cursor:pointer; transition:.3s; display:flex; flex-direction:column; gap:5px; width:40px; height:40px; justify-content:center; align-items:center; }
+.menu-toggle span { width:24px; height:2px; background:#111; transition:.3s; border-radius:2px; }
+.menu-toggle:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+.menu-toggle.active span:nth-child(1){ transform:rotate(45deg) translate(6px,6px); }
+.menu-toggle.active span:nth-child(2){ opacity:0; }
+.menu-toggle.active span:nth-child(3){ transform:rotate(-45deg) translate(6px,-6px); }
+.nav-links { position:fixed; top:0; right:-350px; width:350px; height:100vh; background:rgba(255,255,255,0.98); backdrop-filter:blur(20px); box-shadow:-4px 0 24px rgba(0,0,0,0.1); z-index:1000; transition:right .4s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; padding:100px 40px 40px; gap:8px; }
+.nav-links.active { right:0; }
+.nav-links a { color:rgba(20,20,20,0.7); text-decoration:none; padding:16px 20px; border-radius:8px; transition:.3s; font-size:1.1rem; font-weight:500; }
+.nav-links a:hover { color:#111; background:rgba(17,17,17,0.05); transform:translateX(-4px); }
+.nav-links a.login-cta { background:#111; color:#fff; font-weight:600; text-decoration:none; padding:16px 20px; border-radius:12px; border:1px solid rgba(0,0,0,0.5); font-size:1.05rem; letter-spacing:.25px; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:.25s; }
+.nav-links a.login-cta:hover { background:#000; border-color:#000; box-shadow:0 4px 14px rgba(0,0,0,0.18); transform:translateX(-4px); }
+#darkModeToggle { background:rgba(17,17,17,0.08); border:1px solid rgba(0,0,0,0.1); padding:12px 20px; border-radius:8px; cursor:pointer; color:#111; font-weight:600; margin-top:20px; transition:.3s; font-size:1.1rem; text-align:left; }
+#darkModeToggle:hover { background:rgba(17,17,17,0.12); transform:translateX(-4px); }
+.menu-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0); z-index:999; pointer-events:none; transition:background .4s; }
+.menu-overlay.active { background:rgba(0,0,0,0.3); pointer-events:all; }
+/* Dark mode */
+body.dark-mode nav { background:linear-gradient(180deg,rgba(30,30,30,0.95),rgba(20,20,20,0.98))!important; border-bottom:1px solid rgba(255,255,255,0.1)!important; }
+body.dark-mode .menu-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); }
+body.dark-mode .menu-toggle span { background:#fff; }
+body.dark-mode .nav-links { background:rgba(30,30,30,0.98); box-shadow:-4px 0 24px rgba(0,0,0,0.5); }
+body.dark-mode .nav-links a { color:rgba(255,255,255,0.7)!important; }
+body.dark-mode .nav-links a:hover { color:#fff!important; background:rgba(255,255,255,0.1); }
+body.dark-mode .nav-links a.login-cta { background:#fff!important; color:#111!important; border:1px solid rgba(255,255,255,0.25); box-shadow:0 2px 10px rgba(0,0,0,0.55); }
+body.dark-mode .nav-links a.login-cta:hover { background:#fff!important; color:#111!important; border-color:rgba(255,255,255,0.45); box-shadow:0 6px 18px rgba(0,0,0,0.7); }
+body.dark-mode #darkModeToggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); color:#fff; }
+body.dark-mode #darkModeToggle:hover { background:rgba(255,255,255,0.2); }
+/* Existing item styles below */
     body { font-family: Inter, system-ui, sans-serif; margin:0; background:linear-gradient(180deg,#faf7f4 0%,#f3efe9 100%); color:#1a1a1a; }
-    nav { position:fixed; top:0; left:0; right:0; padding:1.1rem 3rem; display:flex; justify-content:center; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,0,0,0.08); z-index:50;}
-    .logo { font-weight:700; letter-spacing:1px; }
     main { max-width:1100px; margin:120px auto 60px; padding:0 2rem; }
     .item-layout { display:grid; grid-template-columns: minmax(0,580px) minmax(0,1fr); gap:50px; align-items:start; }
     .media-box { border-radius:16px; overflow:hidden; background:#f6f6f6; box-shadow:0 12px 34px rgba(0,0,0,0.06); position:relative; }
@@ -27,7 +56,6 @@
     a.back { display:inline-flex; align-items:center; gap:6px; font-size:0.9rem; text-decoration:none; color:#111; margin-bottom:26px; }
     /* Dark mode quick override */
     body.dark-mode { background:linear-gradient(180deg,#1a1a1a,#0f0f0f); color:#e5e5e5; }
-    body.dark-mode nav { background:rgba(25,25,25,0.9); border-color:rgba(255,255,255,0.1); }
     body.dark-mode .media-box { background:#222; box-shadow:0 12px 34px rgba(0,0,0,0.5); }
     body.dark-mode .desc { color:#c8c8c8; }
     body.dark-mode .stock { color:#b0b0b0; }
@@ -55,6 +83,23 @@
 </head>
 <body>
 <nav><div class="logo"><a href="{{ url_for('home') }}" style="text-decoration:none; color:inherit;">PRISM AUDIO</a></div></nav>
+<button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="nav-links" id="navMenu">
+  <a href="{{ url_for('home') }}">Home</a>
+  <a href="{{ url_for('products') }}">Products</a>
+  <a href="{{ url_for('turntables') }}">Turntables</a>
+  <a href="{{ url_for('speakers') }}">Speakers</a>
+  <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+  <a href="{{ url_for('about') }}">About</a>
+  <button id="darkModeToggle">☾ Dark Mode</button>
+  <div style="flex:1;"></div>
+  {% if session.get('user_id') %}
+    <a href="{{ url_for('account') }}">My Account</a>
+  {% else %}
+    <a class="login-cta" href="{{ url_for('login') }}">Log in</a>
+  {% endif %}
+</div>
 <main>
     <a class="back" href="{{ url_for('products') }}">&larr; Back to products</a>
     <div class="item-layout">
@@ -103,8 +148,19 @@
     {% endif %}
 </main>
 <script>
-    // Optional: inherit dark mode preference
-    if(localStorage.getItem('darkMode')==='enabled'){ document.body.classList.add('dark-mode'); }
+    // Replace existing dark mode init with shared script
+const menuToggle=document.getElementById('menuToggle');
+const navMenu=document.getElementById('navMenu');
+const menuOverlay=document.getElementById('menuOverlay');
+const toggle=document.getElementById('darkModeToggle');
+const body=document.body;
+menuToggle.addEventListener('click',()=>{menuToggle.classList.toggle('active');navMenu.classList.toggle('active');menuOverlay.classList.toggle('active');});
+menuOverlay.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');});
+navMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');}));
+if(localStorage.getItem('darkMode')==='enabled'){enableDarkMode();}
+toggle.addEventListener('click',()=>{body.classList.contains('dark-mode')?disableDarkMode():enableDarkMode();});
+function enableDarkMode(){ body.classList.add('dark-mode'); toggle.textContent='☀ Light Mode'; localStorage.setItem('darkMode','enabled'); }
+function disableDarkMode(){ body.classList.remove('dark-mode'); toggle.textContent='☾ Dark Mode'; localStorage.removeItem('darkMode'); }
 </script>
 </body>
 </html>

@@ -126,7 +126,40 @@
             background: rgba(17,17,17,0.05);
             transform: translateX(-4px);
         }
-        
+
+        /* Login button */
+        .nav-links a.login-cta {
+            background:#111;
+            color:#fff;
+            font-weight:600;
+            text-decoration:none;
+            padding:16px 20px;
+            border-radius:12px;
+            border:1px solid rgba(0,0,0,0.5);
+            font-size:1.05rem;
+            letter-spacing:.25px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.12);
+            transition:background .25s ease, box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+        }
+        .nav-links a.login-cta:hover {
+            background:#000;
+            border-color:#000;
+            box-shadow:0 4px 14px rgba(0,0,0,0.18);
+            transform:translateX(-4px);
+        }
+        /* Dark mode override: keep button white with dark text */
+        body.dark-mode .nav-links a.login-cta {
+            background:#fff !important;
+            color:#111 !important;
+            border:1px solid rgba(255,255,255,0.25);
+            box-shadow:0 2px 10px rgba(0,0,0,0.55);
+        }
+        body.dark-mode .nav-links a.login-cta:hover {
+            background:#fff !important;
+            color:#111 !important;
+            border-color:rgba(255,255,255,0.45);
+            box-shadow:0 6px 18px rgba(0,0,0,0.7);
+        }
         /* Dark mode toggle in menu */
         #darkModeToggle {
             background: rgba(17,17,17,0.08);
@@ -459,7 +492,7 @@
         {% if session.get('user_id') %}
           <a href="{{ url_for('account') }}">My Account</a>
         {% else %}
-          <a href="{{ url_for('login') }}">Log in</a>
+          <a class="login-cta" href="{{ url_for('login') }}">Log in</a>
         {% endif %}
     </div>
 
