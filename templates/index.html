@@ -425,6 +425,18 @@
             color: #b0b0b0 !important;
             border: 1px solid rgba(255,255,255,0.1) !important;
         }
+
+        .featured-card { position:relative; }
+        .featured-card .card-link,
+        .category-panel .sample-link {
+            position:absolute;
+            inset:0;
+            z-index:5;
+            text-indent:-9999px;
+        }
+        .featured-card .kv,
+        .featured-card .card-body,
+        .category-panel .category-content { position:relative; z-index:6; }
     </style>
 </head>
 <body class="products-page">
@@ -486,6 +498,7 @@
                         {% if loop.index is odd %}
                             <div class="category-media">
                                 {% if item %}
+                                    <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
                                     <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
                                 {% else %}
                                     <div style="padding:28px; color:#6b6b6b;">No sample available</div>
@@ -517,6 +530,7 @@
 
                             <div class="category-media">
                                 {% if item %}
+                                    <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
                                     <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
                                 {% else %}
                                     <div style="padding:28px; color:#6b6b6b;">No sample available</div>
@@ -535,6 +549,7 @@
                 {% for key, item in samples.items() %}
                     {% if item %}
                     <article class="featured-card panel" style="min-height:180px;">
+                        <a class="card-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
                         <img src="{{ item.image }}" alt="{{ item.name }}">
                         <div class="card-body">
                             <h3>{{ item.name }}</h3>

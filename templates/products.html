@@ -256,6 +256,7 @@
             flex-direction:column;
             box-shadow: 0 10px 30px rgba(20,20,20,0.06);
             transition: transform .18s ease, box-shadow .18s ease;
+            position:relative; /* added position for overlay */
         }
         .product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 46px rgba(18,18,18,0.08); }
         .product-media { width:100%; height:320px; background:#f6f6f6; display:block; object-fit:cover; }
@@ -273,6 +274,32 @@
             text-decoration:none;
             font-weight:600;
             box-shadow: 0 8px 28px rgba(17,17,17,0.12);
+        }
+        .btn-details {
+            background:transparent;
+            border:1px solid rgba(0,0,0,0.15);
+            color:#111;
+            padding:8px 12px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+            font-size:0.85rem;
+            line-height:1;
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            transition:.18s ease;
+        }
+        .btn-details:hover {
+            border-color:#111;
+            transform:translateY(-2px);
+        }
+        body.dark-mode .btn-details {
+            border-color:rgba(255,255,255,0.35);
+            color:#f5f5f5;
+        }
+        body.dark-mode .btn-details:hover {
+            border-color:#fff;
         }
 
         /* compact card variant for smaller items */
@@ -475,13 +502,16 @@
                         <div class="product-meta small-meta">
                             <span>{{ p.category }}</span>
                             <span>•</span>
-                            <span>{{ p.get('stock', '—') }} in stock</span>
+                            <span>{{ p.stock }} in stock</span>
                         </div>
                         <p class="product-desc">{{ p.description }}</p>
                     </div>
                     <div class="product-footer">
                         <div class="price">${{ '%.2f'|format(p.price) }}</div>
-                        <a class="btn-buy" href="mailto:orders@example.com?subject=Order%20{{ p.name|urlencode }}">Buy</a>
+                        <div class="actions" style="display:flex; gap:6px;">
+                            <a class="btn-details" href="{{ url_for('product_detail_slug', slug=slugify(p.name)) }}">Details</a>
+                            <a class="btn-buy" href="mailto:orders@example.com?subject=Order%20{{ p.name|urlencode }}">Buy</a>
+                        </div>
                     </div>
                 </div>
             </article>

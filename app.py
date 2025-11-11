@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from werkzeug.utils import secure_filename  # NEW
+import re
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET", "dev-secret-change-me")
@@ -277,6 +278,65 @@ def admin_delete_product(product_id: int):
     except sqlite3.IntegrityError:
         flash("Cannot delete product because it is referenced by existing orders.", "error")
     return redirect(url_for("admin_page"))
+
+def slugify(name: str) -> str:
+    s = name.lower()
+    s = re.sub(r'[^a-z0-9]+', '-', s)   # replace non-alphanum with hyphen
+    s = re.sub(r'-{2,}', '-', s).strip('-')
+    return s
+
+@app.context_processor
+def util_ctx():
+    return {"slugify": slugify}
+
+@app.route("/product/<int:product_id>")
+def product_detail(product_id: int):
+    # ID route kept for backward links; now redirects to slug version
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, name, category, price, stock, description, image FROM products WHERE id = ?",
+            (product_id,)
+        ).fetchone()
+    if not row:
+        abort(404)
+    return redirect(url_for("product_detail_slug", slug=slugify(row["name"])), 301)
+
+@app.route("/product/<slug>")
+def product_detail_slug(slug: str):
+    target = slug.lower()
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, name, category, price, stock, description, image FROM products"
+        ).fetchall()
+    product = None
+    for r in rows:
+        if slugify(r["name"]) == target:
+            product = dict(r)
+            break
+    if not product:
+        abort(404)
+
+    # recent views (store IDs, reuse existing logic)
+    recent = session.get("recent_views", [])
+    pid = product["id"]
+    if pid in recent:
+        recent.remove(pid)
+    recent.insert(0, pid)
+    session["recent_views"] = recent[:10]
+
+    show_ids = [i for i in recent if i != pid][:3]
+    recent_products = []
+    if show_ids:
+        with get_db() as conn:
+            for i in show_ids:
+                r = conn.execute(
+                    "SELECT id, name, category, price, stock, description, image FROM products WHERE id = ?",
+                    (i,)
+                ).fetchone()
+                if r:
+                    recent_products.append(dict(r))
+
+    return render_template("item.html", product=product, recent=recent_products)
 
 # Start the dev server when running this file directly
 if __name__ == "__main__":
