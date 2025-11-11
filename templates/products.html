@@ -487,6 +487,7 @@
         <a href="{{ url_for('speakers') }}">Speakers</a>
         <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
         <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a>
         <button id="darkModeToggle">☾ Dark Mode</button>
         <div style="flex:1;"></div>
         {% if session.get('user_id') %}
@@ -544,6 +545,15 @@
                         <div class="actions" style="display:flex; gap:6px;">
                             <a class="btn-details" href="{{ url_for('product_detail_slug', slug=slugify(p.name)) }}">Details</a>
                             <a class="btn-buy" href="mailto:orders@example.com?subject=Order%20{{ p.name|urlencode }}">Buy</a>
+                            {% if p.stock > 0 %}
+                            <form action="{{ url_for('cart_add') }}" method="post" style="display:inline;">
+                                <input type="hidden" name="product_id" value="{{ p.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn-details" aria-label="Add {{ p.name }} to cart">Add to Cart</button>
+                            </form>
+                            {% else %}
+                            <button class="btn-details" disabled>Out of stock</button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

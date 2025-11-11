@@ -257,6 +257,7 @@
       <a href="{{ url_for('speakers') }}">Speakers</a>
       <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
       <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a>
       <button id="darkModeToggle">☾ Dark Mode</button>
       <div style="flex:1;"></div>
       {% if session.get('user_id') %}

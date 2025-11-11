@@ -287,7 +287,14 @@ def slugify(name: str) -> str:
 
 @app.context_processor
 def util_ctx():
-    return {"slugify": slugify}
+    def cart_count():
+        cart = session.get("cart", {})
+        # keys may be strings; quantities are ints
+        try:
+            return sum(int(q) for q in cart.values())
+        except Exception:
+            return 0
+    return {"slugify": slugify, "cart_count": cart_count()}
 
 @app.route("/product/<int:product_id>")
 def product_detail(product_id: int):
@@ -337,6 +344,147 @@ def product_detail_slug(slug: str):
                     recent_products.append(dict(r))
 
     return render_template("item.html", product=product, recent=recent_products)
+
+# --- Shopping cart helpers ---
+def _get_cart() -> dict:
+    # store as {str(product_id): int(quantity)}
+    cart = session.get("cart", {})
+    # ensure types
+    fixed = {}
+    for k, v in cart.items():
+        try:
+            q = int(v)
+            if q > 0:
+                fixed[str(int(k))] = q
+        except Exception:
+            continue
+    if fixed != cart:
+        session["cart"] = fixed
+    return fixed
+
+def _set_cart(cart: dict) -> None:
+    session["cart"] = cart
+
+def _clamp_qty(q: int, stock: int) -> int:
+    if stock is not None and stock >= 0:
+        return max(1, min(q, stock))
+    return max(1, q)
+
+def _fetch_products_by_ids(ids: list[int]) -> list[dict]:
+    if not ids:
+        return []
+    placeholders = ",".join(["?"] * len(ids))
+    with get_db() as conn:
+        rows = conn.execute(
+            f"SELECT id, name, category, price, stock, description, image FROM products WHERE id IN ({placeholders})",
+            ids,
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+# --- Cart routes ---
+@app.route("/cart", methods=["GET"])
+def cart():
+    cart = _get_cart()
+    ids = [int(pid) for pid in cart.keys()]
+    items = _fetch_products_by_ids(ids)
+
+    # map by id for stable lookup
+    by_id = {p["id"]: p for p in items}
+
+    line_items = []
+    subtotal = 0.0
+    for pid_str, qty in cart.items():
+        pid = int(pid_str)
+        product = by_id.get(pid)
+        if not product:
+            continue
+        qty = min(qty, max(0, product.get("stock", 0)))
+        if qty <= 0:
+            continue
+        line_total = product["price"] * qty
+        subtotal += line_total
+        line_items.append({
+            "product": product,
+            "quantity": qty,
+            "line_total": line_total
+        })
+
+    return render_template("cart.html", items=line_items, subtotal=subtotal)
+
+@app.post("/cart/add")
+def cart_add():
+    pid_raw = request.form.get("product_id")
+    qty_raw = request.form.get("quantity", "1")
+    try:
+        pid = int(pid_raw)
+        qty = int(qty_raw)
+    except Exception:
+        flash("Invalid cart request.", "error")
+        return redirect(request.referrer or url_for("products"))
+
+    # verify product exists and clamp to stock
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, stock FROM products WHERE id = ?",
+            (pid,),
+        ).fetchone()
+    if not row:
+        flash("Product not found.", "error")
+        return redirect(request.referrer or url_for("products"))
+
+    stock = row["stock"] if row["stock"] is not None else 0
+    if stock <= 0:
+        flash("This item is out of stock.", "error")
+        return redirect(request.referrer or url_for("products"))
+
+    cart = _get_cart()
+    current = int(cart.get(str(pid), 0))
+    new_qty = _clamp_qty(current + max(1, qty), stock)
+    cart[str(pid)] = new_qty
+    _set_cart(cart)
+    flash("Added to cart.", "success")
+    return redirect(request.referrer or url_for("cart"))
+
+@app.post("/cart/update")
+def cart_update():
+    pid_raw = request.form.get("product_id")
+    qty_raw = request.form.get("quantity", "1")
+    try:
+        pid = int(pid_raw)
+        qty = int(qty_raw)
+    except Exception:
+        flash("Invalid cart update.", "error")
+        return redirect(url_for("cart"))
+
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, stock FROM products WHERE id = ?",
+            (pid,),
+        ).fetchone()
+
+    if not row:
+        flash("Product not found.", "error")
+        return redirect(url_for("cart"))
+
+    stock = row["stock"] if row["stock"] is not None else 0
+    cart = _get_cart()
+
+    if qty <= 0:
+        cart.pop(str(pid), None)
+    else:
+        cart[str(pid)] = _clamp_qty(qty, stock)
+
+    _set_cart(cart)
+    flash("Cart updated.", "success")
+    return redirect(url_for("cart"))
+
+@app.post("/cart/remove/<int:product_id>")
+def cart_remove(product_id: int):
+    cart = _get_cart()
+    cart.pop(str(product_id), None)
+    _set_cart(cart)
+    flash("Item removed.", "success")
+    return redirect(url_for("cart"))
 
 # Start the dev server when running this file directly
 if __name__ == "__main__":
