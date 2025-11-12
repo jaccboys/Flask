@@ -285,57 +285,64 @@
         {% set sections = [("Turntables","Turntable","turntables"),
                           ("Speakers","Speaker","speakers"),
                           ("Amplifiers","Amplifier","amplifiers")] %}
-
+        {% set hero_map = {
+          'Turntables': url_for('static', filename='images/turntables-hero.jpg'),
+          'Speakers': url_for('static', filename='images/speaker-hero.jpg'),
+          'Amplifiers': url_for('static', filename='images/amplifier-hero.jpg')
+        } %}
         <section style="display:flex; flex-direction:column; gap:36px; margin-bottom:40px;">
-            {% for title, key, route in sections %}
-                {% set item = samples.get(key) %}
-                <section class="category-panel">
-                    <div class="category-inner">
-                        {% if loop.index is odd %}
-                            <div class="category-media">
-                                {% if item %}
-                                    <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
-                                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
-                                {% else %}
-                                    <div style="padding:28px; color:#6b6b6b;">No sample available</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="category-content">
-                                <h2 style="font-family: 'Playfair Display', serif; font-size:2rem; margin:0;">{{ title }}</h2>
-                                <p style="color:#6b6b6b; margin:0; max-width:62ch;">
-                                    {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
-                                </p>
-                                <div style="display:flex; gap:12px; margin-top:6px;">
-                                    <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="category-content">
-                                <h2 style="font-family: 'Playfair Display', serif; font-size:2rem; margin:0;">{{ title }}</h2>
-                                <p style="color:#6b6b6b; margin:0; max-width:62ch;">
-                                    {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
-                                </p>
-                                <div style="display:flex; gap:12px; margin-top:6px;">
-                                    <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
-                                    {% if item %}
-                                        <a class="cta-ghost" href="{{ url_for(route) }}#product-{{ item.id }}">View sample</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="category-media">
-                                {% if item %}
-                                    <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
-                                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
-                                {% else %}
-                                    <div style="padding:28px; color:#6b6b6b;">No sample available</div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
+          {% for title, key, route in sections %}
+            {% set item = samples.get(key) %}
+            {% set hero = hero_map.get(title) %}
+            <section class="category-panel">
+              <div class="category-inner">
+                {% if loop.index is odd %}
+                  <div class="category-media">
+                    {% if hero %}
+                      <img src="{{ hero }}" alt="{{ title }} hero" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    {% elif item %}
+                      <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
+                      <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    {% else %}
+                      <div style="padding:28px; color:#6b6b6b;">No sample available</div>
+                    {% endif %}
+                  </div>
+                  <div class="category-content">
+                    <h2 style="font-family:'Playfair Display',serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                    <p style="color:#6b6b6b; margin:0; max-width:62ch;">
+                      {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
+                    </p>
+                    <div style="display:flex; gap:12px; margin-top:6px;">
+                      <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
                     </div>
-                </section>
-            {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="category-content">
+                    <h2 style="font-family:'Playfair Display',serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                    <p style="color:#6b6b6b; margin:0; max-width:62ch;">
+                      {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
+                    </p>
+                    <div style="display:flex; gap:12px; margin-top:6px;">
+                      <a class="cta-primary" href="{{ url_for(route) }}">Browse {{ title }}</a>
+                      {% if item and not hero %}
+                        <a class="cta-ghost" href="{{ url_for(route) }}#product-{{ item.id }}">View sample</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="category-media">
+                    {% if hero %}
+                      <img src="{{ hero }}" alt="{{ title }} hero" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    {% elif item %}
+                      <a class="sample-link" href="{{ url_for('product_detail', product_id=item.id) }}" aria-label="View {{ item.name }}"></a>
+                      <img src="{{ item.image }}" alt="{{ item.name }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    {% else %}
+                      <div style="padding:28px; color:#6b6b6b;">No sample available</div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </section>
+          {% endfor %}
         </section>
 
         {# Quick samples grid similar to products page #}
