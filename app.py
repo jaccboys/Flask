@@ -63,6 +63,17 @@ def products():
         ).fetchall()
     return render_template("products.html", products=[dict(r) for r in rows])
 
+# Add a simple password strength checker
+def is_strong_password(pw: str) -> bool:
+    # 10+ chars, at least one lowercase, uppercase, and digit
+    return (
+        isinstance(pw, str)
+        and len(pw) >= 10
+        and re.search(r"[a-z]", pw)
+        and re.search(r"[A-Z]", pw)
+        and re.search(r"\d", pw)
+    ) is not None
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -70,11 +81,17 @@ def signup():
         last = request.form.get("last_name", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-
-        if not all([first, last, email, password]):
+        password_confirm = request.form.get("password_confirm", "")
+        if not all([first, last, email, password, password_confirm]):
             flash("All fields are required.", "error")
             return render_template("signup.html"), 400
-
+        if password != password_confirm:
+            flash("Passwords do not match.", "error")
+            return render_template("signup.html"), 400
+        # NEW: enforce strength
+        if not is_strong_password(password):
+            flash("Password must be at least 10 characters and include uppercase, lowercase, and a number.", "error")
+            return render_template("signup.html"), 400
         pwd_hash = generate_password_hash(password)
         try:
             with get_db() as conn:
@@ -92,7 +109,6 @@ def signup():
         except sqlite3.IntegrityError:
             flash("Email already registered.", "error")
             return render_template("signup.html"), 400
-
     return render_template("signup.html")
 
 @app.route("/login", methods=["GET", "POST"])
