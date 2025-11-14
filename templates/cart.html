@@ -99,7 +99,8 @@
 
       <div class="summary">
         <div><strong>Subtotal:</strong> ${{ '%.2f'|format(subtotal) }}</div>
-        <a class="btn btn-primary" href="{{ url_for('products') }}">Continue shopping</a>
+        <a class="btn" href="{{ url_for('products') }}">Continue shopping</a>
+        <a class="btn btn-primary" href="{{ url_for('checkout') }}">Proceed to checkout</a>
       </div>
     {% endif %}
   </main>

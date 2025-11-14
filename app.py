@@ -397,14 +397,11 @@ def _fetch_products_by_ids(ids: list[int]) -> list[dict]:
         ).fetchall()
     return [dict(r) for r in rows]
 
-# --- Cart routes ---
-@app.route("/cart", methods=["GET"])
-def cart():
+def _cart_summary():
+    """Return (line_items, subtotal) where each item is {product, quantity, line_total}."""
     cart = _get_cart()
     ids = [int(pid) for pid in cart.keys()]
     items = _fetch_products_by_ids(ids)
-
-    # map by id for stable lookup
     by_id = {p["id"]: p for p in items}
 
     line_items = []
@@ -414,17 +411,18 @@ def cart():
         product = by_id.get(pid)
         if not product:
             continue
-        qty = min(qty, max(0, product.get("stock", 0)))
+        qty = min(int(qty), max(0, product.get("stock", 0)))
         if qty <= 0:
             continue
-        line_total = product["price"] * qty
+        line_total = float(product["price"]) * qty
         subtotal += line_total
-        line_items.append({
-            "product": product,
-            "quantity": qty,
-            "line_total": line_total
-        })
+        line_items.append({"product": product, "quantity": qty, "line_total": line_total})
+    return line_items, subtotal
 
+# --- Cart routes ---
+@app.route("/cart", methods=["GET"])
+def cart():
+    line_items, subtotal = _cart_summary()
     return render_template("cart.html", items=line_items, subtotal=subtotal)
 
 @app.post("/cart/add")
@@ -501,6 +499,123 @@ def cart_remove(product_id: int):
     _set_cart(cart)
     flash("Item removed.", "success")
     return redirect(url_for("cart"))
+
+# --- Checkout ---
+@app.route("/checkout", methods=["GET", "POST"])
+@login_required
+def checkout():
+    line_items, subtotal = _cart_summary()
+    if not line_items:
+        flash("Your cart is empty.", "error")
+        return redirect(url_for("cart"))
+
+    # Load current customer to prefill address
+    with get_db() as conn:
+        cust = conn.execute(
+            """SELECT id, first_name, last_name, phone, address_line1, address_line2,
+                      city, state, postal_code, country, email
+               FROM customers WHERE id = ?""",
+            (session["user_id"],),
+        ).fetchone()
+    customer = dict(cust) if cust else {}
+
+    if request.method == "POST":
+        # Shipping fields
+        fn = request.form.get("first_name", "").strip()
+        ln = request.form.get("last_name", "").strip()
+        phone = request.form.get("phone", "").strip()
+        a1 = request.form.get("address_line1", "").strip()
+        a2 = request.form.get("address_line2", "").strip()
+        city = request.form.get("city", "").strip()
+        state = request.form.get("state", "").strip()
+        pc = request.form.get("postal_code", "").strip()
+        country = request.form.get("country", "AU").strip() or "AU"
+
+        if not all([fn, ln, a1, city, state, pc]):
+            flash("Please complete all required address fields.", "error")
+            return render_template("checkout.html", items=line_items, subtotal=subtotal, customer=customer), 400
+
+        # Persist address to customer
+        with get_db() as conn:
+            conn.execute(
+                """UPDATE customers
+                   SET first_name=?, last_name=?, phone=?, address_line1=?, address_line2=?,
+                       city=?, state=?, postal_code=?, country=?
+                   WHERE id=?""",
+                (fn, ln, phone, a1, a2, city, state, pc, country, session["user_id"]),
+            )
+            # Create order (tax/shipping left 0 for now)
+            cur = conn.execute(
+                """INSERT INTO orders (customer_id, status, subtotal, tax, shipping, total)
+                   VALUES (?, 'pending', ?, 0, 0, ?)""",
+                (session["user_id"], subtotal, subtotal),
+            )
+            order_id = cur.lastrowid
+            # Insert items
+            for li in line_items:
+                p = li["product"]
+                conn.execute(
+                    """INSERT INTO order_items (order_id, product_id, quantity, unit_price, line_total)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (order_id, p["id"], li["quantity"], p["price"], li["line_total"]),
+                )
+            conn.commit()
+
+        # Clear cart
+        _set_cart({})
+        flash("Order placed. Thank you!", "success")
+        return redirect(url_for("order_confirmation", order_id=order_id))
+
+    return render_template("checkout.html", items=line_items, subtotal=subtotal, customer=customer)
+
+@app.get("/order/<int:order_id>")
+@login_required
+def order_confirmation(order_id: int):
+    with get_db() as conn:
+        row = conn.execute(
+            """
+            SELECT o.*,
+                   c.first_name, c.last_name, c.phone, c.address_line1, c.address_line2,
+                   c.city, c.state, c.postal_code, c.country, c.email
+            FROM orders o
+            JOIN customers c ON c.id = o.customer_id
+            WHERE o.id = ? AND o.customer_id = ?
+            """,
+            (order_id, session["user_id"]),
+        ).fetchone()
+        if not row:
+            abort(404)
+
+        order = dict(row)
+        items_rows = conn.execute(
+            """
+            SELECT oi.quantity, oi.unit_price, oi.line_total, p.name, p.image
+            FROM order_items oi
+            JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = ?
+            """,
+            (order_id,),
+        ).fetchall()
+
+    customer = {
+        "first_name": order.pop("first_name", None),
+        "last_name": order.pop("last_name", None),
+        "phone": order.pop("phone", None),
+        "address_line1": order.pop("address_line1", None),
+        "address_line2": order.pop("address_line2", None),
+        "city": order.pop("city", None),
+        "state": order.pop("state", None),
+        "postal_code": order.pop("postal_code", None),
+        "country": order.pop("country", None),
+        "email": order.pop("email", None),
+    }
+
+    return render_template(
+        "order_confirmation.html",
+        order=order,
+        customer=customer,
+        items=[dict(r) for r in items_rows],
+    )
 
 # Start the dev server when running this file directly
 if __name__ == "__main__":

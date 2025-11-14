@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Order placed — Prism Audio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Page chrome consistent with site */
+    nav {
+      background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,0.98));
+      border-bottom:1px solid rgba(139,90,65,0.1);
+      box-shadow:0 4px 16px rgba(26,26,26,0.04);
+      backdrop-filter:blur(10px) saturate(120%);
+      display:flex; justify-content:center; align-items:center;
+      padding:1.25rem 3rem; position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
+    }
+    .logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.3rem; }
+
+    body.products-page { background:linear-gradient(180deg,#faf7f4,#f3efe9); color:#1a1a1a; font-family:Inter,system-ui,sans-serif; }
+    body.dark-mode { background:#0c0c0c; color:#eaeaea; }
+
+    /* Receipt sheet */
+    .container { max-width:1100px; margin:140px auto 80px; padding:0 20px; }
+    .sheet {
+      background:#fff; border-radius:18px; box-shadow:0 30px 70px rgba(16,16,16,.12);
+      border:1px solid rgba(0,0,0,0.06); overflow:hidden;
+    }
+    .sheet-inner { display:grid; grid-template-columns:1.2fr .8fr; gap:0; }
+    .col { padding:34px 34px 30px; }
+    .left h1 {
+      font-family:"Playfair Display",serif; font-weight:800; line-height:1.05;
+      font-size:2.1rem; margin:0 0 12px 0; color:#111;
+    }
+    .muted { color:#4a4a4a; }                 /* higher contrast on light */
+    body.dark-mode .muted { color:#d0d0d0; }  /* higher contrast on dark */
+
+    /* Billing details: stronger label/value contrast */
+    .kv { display:grid; grid-template-columns:120px 1fr; gap:8px 16px; font-size:.95rem; }
+    .kv div:nth-child(odd)  { color:#2d2d2d; font-weight:600; }   /* labels */
+    .kv div:nth-child(even) { color:#111; }                       /* values */
+    body.dark-mode .kv div:nth-child(odd)  { color:#efefef; }
+    body.dark-mode .kv div:nth-child(even) { color:#ffffff; }
+
+    .btn {
+      display:inline-block; padding:12px 16px; border-radius:10px;
+      border:1px solid #000; background:#111; color:#fff; text-decoration:none; font-weight:600;
+    }
+    .btn:hover { filter:brightness(.95); }
+    body.dark-mode .btn { border-color:#fff; background:#fff; color:#111; }
+
+    /* Brand accent button (kept for future) */
+    .btn-accent { background:#8b5a41; border-color:#8b5a41; color:#fff; }
+    .btn-accent:hover { filter:brightness(.95); }
+    body.dark-mode .btn-accent { background:#d7b08a; border-color:#d7b08a; color:#1a1a1a; }
+
+    /* NEW: white button with black outline */
+    .btn-outline { background:#fff; color:#111; border:1.5px solid #000; }
+    .btn-outline:hover { background:#f5f5f5; }
+    body.dark-mode .btn-outline { background:#fff; color:#111; border-color:#000; }
+
+    /* Right summary "receipt" look */
+    .summary {
+      background:#fff; height:100%;
+      border-left:1px dashed rgba(0,0,0,0.12); position:relative;
+    }
+    .summary::before, .summary::after{
+      content:""; position:absolute; left:-10px; width:20px; height:20px; background:transparent;
+      border-radius:50%; top:-10px; box-shadow:0 0 0 999px #fff; clip-path:inset(0 0 999px 0);
+    }
+    .summary::after{ top:auto; bottom:-10px; }
+    .sum-head { padding-bottom:12px; border-bottom:1px solid rgba(0,0,0,0.08); margin-bottom:14px; }
+    .sum-title { font-weight:800; font-size:1.2rem; margin:0 0 10px 0; }
+    .sum-kv { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:.9rem; }
+    .sum-kv .label { color:#6b6b6b; }
+
+    .item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .item .info { display:flex; gap:10px; align-items:center; }
+    .item img { width:56px; height:56px; object-fit:cover; border-radius:10px; }
+    .totals { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+    .line { display:flex; justify-content:space-between; }
+    .line.total { font-weight:800; }
+
+    /* Dark mode cards */
+    body.dark-mode .sheet { background:rgba(35,35,35,0.95); border:1px solid rgba(255,255,255,0.12); box-shadow:0 30px 80px rgba(0,0,0,.6); }
+    body.dark-mode .summary { background:transparent; border-left:1px dashed rgba(255,255,255,0.18); }
+    body.dark-mode .summary::before, body.dark-mode .summary::after { box-shadow:0 0 0 999px rgba(35,35,35,0.95); }
+    body.dark-mode .left h1 { color:#fff; }
+    body.dark-mode .sum-head { border-bottom:1px solid rgba(255,255,255,0.15); }
+    body.dark-mode .item { border-bottom:1px solid rgba(255,255,255,0.12); }
+    body.dark-mode .muted, body.dark-mode .sum-kv .label { color:#c8c8c8; }
+  </style>
+</head>
+<body class="products-page">
+  <nav><div class="logo">PRISM AUDIO</div></nav>
+
+  <main class="container">
+    <section class="sheet">
+      <div class="sheet-inner">
+        <!-- Left column -->
+        <div class="col left">
+          <h1>Thank you for your purchase!</h1>
+          <p class="muted">Your order will be processed within 24 hours on business days. We’ll email you when it ships.</p>
+
+          <div class="block-title">Billing address</div>
+          <div class="kv">
+            <div>Name</div>
+            <div>
+              {% if customer %}
+                {{ (customer.first_name ~ ' ' ~ customer.last_name)|trim }}
+              {% else %}—{% endif %}
+            </div>
+
+            <div>Address</div>
+            <div>
+              {% if customer and customer.address_line1 %}
+                {{ customer.address_line1 }}{% if customer.address_line2 %}, {{ customer.address_line2 }}{% endif %},
+                {{ customer.city }}, {{ customer.state }} {{ customer.postal_code }},
+                {{ customer.country or 'AU' }}
+              {% else %}—{% endif %}
+            </div>
+
+            <div>Phone</div>
+            <div>{{ customer.phone if customer and customer.phone else '—' }}</div>
+
+            <div>Email</div>
+            <div>{{ (customer.email if customer and customer.email else session.get('email')) or '—' }}</div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <a class="btn" href="{{ url_for('products') }}">Continue shopping</a>
+            <a class="btn btn-outline" style="margin-left:8px;"
+               href="{{ url_for('order_confirmation', order_id=order.id) }}">Track your order</a>
+          </div>
+        </div>
+
+        <!-- Right column: summary -->
+        <aside class="col summary">
+          <div class="sum-head">
+            <div class="sum-title">Order Summary</div>
+            <div class="sum-kv">
+              <div>
+                <div class="label">Order #</div>
+                <div>#{{ order.id }}</div>
+              </div>
+              <div>
+                <div class="label">Status</div>
+                <div style="text-transform:capitalize;">{{ order.status }}</div>
+              </div>
+              <div>
+                <div class="label">Total</div>
+                <div>${{ '%.2f'|format(order.total) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            {% for it in items %}
+              <div class="item">
+                <div class="info">
+                  <img src="{{ it.image }}" alt="{{ it.name }}">
+                  <div>
+                    <div style="font-weight:600;">{{ it.name }}</div>
+                    <div class="muted">Qty {{ it.quantity }}</div>
+                  </div>
+                </div>
+                <div>${{ '%.2f'|format(it.line_total) }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="totals">
+            <div class="line"><div>Sub total</div><div>${{ '%.2f'|format(order.subtotal or order.total) }}</div></div>
+            <div class="line"><div>Shipping</div><div>${{ '%.2f'|format(order.shipping or 0) }}</div></div>
+            <div class="line"><div>Tax</div><div>${{ '%.2f'|format(order.tax or 0) }}</div></div>
+            <div class="line total"><div>Order Total</div><div>${{ '%.2f'|format(order.total) }}</div></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

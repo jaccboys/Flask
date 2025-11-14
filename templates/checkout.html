@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Checkout — Prism Audio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body.products-page { background:linear-gradient(180deg,#faf7f4,#f3efe9); color:#1a1a1a; font-family:Inter,system-ui,sans-serif; }
+    nav { background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,0.98)); border-bottom:1px solid rgba(139,90,65,0.1); box-shadow:0 4px 16px rgba(26,26,26,0.04); backdrop-filter:blur(10px) saturate(120%); display:flex; justify-content:center; align-items:center; padding:1.25rem 3rem; position:fixed; top:0; left:0; right:0; width:100%; z-index:100; }
+    .logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.3rem; }
+    .container { max-width:1100px; margin:120px auto 60px; padding:0 20px; }
+    .grid { display:grid; grid-template-columns: 1.1fr .9fr; gap:24px; }
+    .card { background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.06); }
+    .card h2 { margin:0 0 10px 0; }
+    .pad { padding:18px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    input, select { padding:12px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; width:100%; }
+    .summary-line { display:flex; justify-content:space-between; padding:6px 0; }
+    .btn-primary { background:#111; color:#fff; border:1px solid #000; padding:12px 18px; border-radius:10px; cursor:pointer; }
+    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+    .muted { color:#6b6b6b; }
+    body.dark-mode .card { background:rgba(40,40,40,0.9); border:1px solid rgba(255,255,255,0.12); }
+    body.dark-mode input, body.dark-mode select { background:rgba(255,255,255,0.06); color:#e0e0e0; border-color:rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body class="products-page">
+  <nav><div class="logo">PRISM AUDIO</div></nav>
+
+  <main class="container">
+    <h1 style="margin-bottom:12px;">Checkout</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul style="list-style:none; padding:0; margin:0 0 12px 0;">
+          {% for category, message in messages %}
+            <li style="padding:10px 12px; border-radius:8px; margin-bottom:8px; background:#ecfff1; color:#333;">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <div class="grid">
+      <form class="card pad" action="{{ url_for('checkout') }}" method="post" novalidate>
+        <h2>Shipping address</h2>
+        <div class="row">
+          <div class="field">
+            <label>First name</label>
+            <input name="first_name" value="{{ customer.first_name or '' }}" required>
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input name="last_name" value="{{ customer.last_name or '' }}" required>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Phone</label>
+            <input name="phone" value="{{ customer.phone or '' }}">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input value="{{ customer.email or '' }}" disabled>
+          </div>
+        </div>
+        <div class="field">
+          <label>Address line 1</label>
+          <input name="address_line1" value="{{ customer.address_line1 or '' }}" required>
+        </div>
+        <div class="field">
+          <label>Address line 2 (optional)</label>
+          <input name="address_line2" value="{{ customer.address_line2 or '' }}">
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label>City</label>
+            <input name="city" value="{{ customer.city or '' }}" required>
+          </div>
+          <div class="field">
+            <label>State</label>
+            <input name="state" value="{{ customer.state or '' }}" required>
+          </div>
+          <div class="field">
+            <label>Postcode</label>
+            <input name="postal_code" value="{{ customer.postal_code or '' }}" required>
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label>Country</label>
+          <input name="country" value="{{ customer.country or 'AU' }}">
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn-primary" type="submit">Checkout</button>
+          <span class="muted" style="margin-left:8px;">(no payment yet)</span>
+        </div>
+      </form>
+
+      <aside class="card pad">
+        <h2>Order summary</h2>
+        <div class="muted">Review items before placing your order.</div>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:10px;">
+          {% for li in items %}
+            {% set p = li.product %}
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="{{ p.image }}" alt="{{ p.name }}" style="width:54px; height:54px; object-fit:cover; border-radius:8px;">
+                <div>
+                  <div style="font-weight:600;">{{ p.name }}</div>
+                  <div class="muted">Qty {{ li.quantity }} · ${{ '%.2f'|format(p.price) }}</div>
+                </div>
+              </div>
+              <div>${{ '%.2f'|format(li.line_total) }}</div>
+            </div>
+          {% endfor %}
+        </div>
+        <hr style="margin:14px 0; border:none; border-top:1px solid rgba(0,0,0,0.1);">
+        <div class="summary-line"><div>Subtotal</div><div>${{ '%.2f'|format(subtotal) }}</div></div>
+        <div class="summary-line"><div>Shipping</div><div>$0.00</div></div>
+        <div class="summary-line" style="font-weight:700;"><div>Total</div><div>${{ '%.2f'|format(subtotal) }}</div></div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
