@@ -6,6 +6,8 @@ from functools import wraps
 from werkzeug.utils import secure_filename  # NEW
 import re
 
+ORDER_STATUSES = ["pending", "shipped", "cancelled", "refunded"]  # removed "paid"
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET", "dev-secret-change-me")
 
@@ -203,8 +205,62 @@ def admin_page():
         rows = conn.execute(
             "SELECT id, name, sku, category, description, price, stock, image FROM products ORDER BY id"
         ).fetchall()
+        products = [dict(r) for r in rows]
+
+        # NEW: load orders + customer details
+        order_rows = conn.execute(
+            """
+            SELECT o.id, o.customer_id, o.status, o.subtotal, o.tax, o.shipping, o.total, o.placed_at,
+                   c.first_name, c.last_name, c.email, c.phone,
+                   c.address_line1, c.address_line2, c.city, c.state, c.postal_code, c.country
+            FROM orders o
+            JOIN customers c ON c.id = o.customer_id
+            ORDER BY o.placed_at DESC, o.id DESC
+            """
+        ).fetchall()
+        orders = [dict(r) for r in order_rows]
+
+        # NEW: load all order items in one query and group by order_id
+        if orders:
+            order_ids = [o["id"] for o in orders]
+            placeholders = ",".join(["?"] * len(order_ids))
+            item_rows = conn.execute(
+                f"""
+                SELECT oi.order_id, oi.quantity, oi.unit_price, oi.line_total,
+                       p.name, p.sku, p.image
+                FROM order_items oi
+                JOIN products p ON p.id = oi.product_id
+                WHERE oi.order_id IN ({placeholders})
+                ORDER BY oi.id
+                """,
+                order_ids,
+            ).fetchall()
+
+            items_by_order = {}
+            for r in item_rows:
+                d = dict(r)
+                items_by_order.setdefault(d["order_id"], []).append({
+                    "name": d["name"],
+                    "sku": d["sku"],
+                    "image": d["image"],
+                    "quantity": d["quantity"],
+                    "unit_price": d["unit_price"],
+                    "line_total": d["line_total"],
+                })
+
+            for o in orders:
+                o["items"] = items_by_order.get(o["id"], [])
+        else:
+            orders = []
+
     categories = ["Turntable", "Speaker", "Amplifier"]
-    return render_template("admin.html", products=[dict(r) for r in rows], categories=categories)
+    return render_template(
+        "admin.html",
+        products=products,
+        categories=categories,
+        orders=orders,            # NEW
+        statuses=ORDER_STATUSES,  # NEW
+    )
 
 @app.post("/admin/product/create")
 def admin_create_product():
@@ -293,6 +349,23 @@ def admin_delete_product(product_id: int):
         flash("Product deleted.", "success")
     except sqlite3.IntegrityError:
         flash("Cannot delete product because it is referenced by existing orders.", "error")
+    return redirect(url_for("admin_page"))
+
+@app.post("/admin/order/<int:order_id>/status")  # NEW
+def admin_update_order_status(order_id: int):
+    new_status = (request.form.get("status") or "").strip().lower()
+    if new_status not in ORDER_STATUSES:
+        flash("Invalid status.", "error")
+        return redirect(url_for("admin_page"))
+
+    with get_db() as conn:
+        row = conn.execute("SELECT id FROM orders WHERE id = ?", (order_id,)).fetchone()
+        if not row:
+            flash("Order not found.", "error")
+            return redirect(url_for("admin_page"))
+        conn.execute("UPDATE orders SET status = ? WHERE id = ?", (new_status, order_id))
+        conn.commit()
+    flash("Order status updated.", "success")
     return redirect(url_for("admin_page"))
 
 def slugify(name: str) -> str:

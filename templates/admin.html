@@ -57,6 +57,21 @@
     .flash.error { background:#ffe4e4; color:#680000; border:1px solid #ffb3b3; }
     .flash.success { background:#e4f7ea; color:#0d5f26; border:1px solid #b8e6c5; }
 
+    /* Collapsible cards (details/summary) */
+    details.accordion { background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.08); }
+    details.accordion[open] { box-shadow:0 10px 28px rgba(0,0,0,0.10); }
+    details.accordion > summary {
+      list-style:none; cursor:pointer; padding:16px 18px; user-select:none;
+      display:flex; align-items:center; gap:10px; font-family:'Playfair Display', serif;
+      font-size:1.15rem; font-weight:700;
+      background:#fff; border-radius:14px;
+    }
+    details.accordion > summary::-webkit-details-marker { display:none; }
+    .chev { margin-left:auto; transition:transform .25s ease; }
+    details[open] .chev { transform:rotate(180deg); }
+    .panel-body { padding:0 18px 18px; }
+    .muted { color:#666; font-weight:500; font-size:.95rem; }
+
     @media (max-width:900px){
       .fields { grid-template-columns: 1fr 1fr; }
       .product-form { grid-template-columns: 90px 1fr; }
@@ -84,120 +99,231 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Create -->
-    <section class="card">
-      <h2>Create new product</h2>
-      <form action="{{ url_for('admin_create_product') }}" method="post" enctype="multipart/form-data">
-        <div class="fields">
-          <div class="field span-2">
-            <label>Name</label>
-            <input type="text" name="name" placeholder="e.g. Classic Belt-Drive Turntable" required>
-          </div>
-          <div class="field">
-            <label>SKU</label>
-            <input type="text" name="sku" placeholder="Optional">
-          </div>
-          <div class="field">
-            <label>Category</label>
-            <select name="category" required>
-              <option value="" disabled selected>Select category</option>
-              {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
-            </select>
-          </div>
-          <div class="field">
-            <label>Price</label>
-            <input type="number" name="price" step="0.01" placeholder="0.00" required>
-          </div>
-          <div class="field">
-            <label>Stock</label>
-            <input type="number" name="stock" step="1" value="0">
-          </div>
-          <div class="field span-3">
-            <label>Image URL</label>
-            <input type="text" name="image_url" placeholder="/static/images/turntable1.jpg">
-          </div>
-          <div class="field">
-            <label>Upload Image</label>
-            <input type="file" name="image_file" accept="image/*">
-          </div>
-          <div class="field span-4">
-            <label>Description</label>
-            <textarea name="description" placeholder="Short, helpful description"></textarea>
-          </div>
-          <div class="actions span-4">
-            <button class="btn" type="submit">Create</button>
-          </div>
-        </div>
-      </form>
-    </section>
-
-    <!-- List + edit -->
-    <section class="card" style="margin-top:16px;">
-      <h2>All products</h2>
-
-      {% for p in products %}
-        <form class="product-form" action="{{ url_for('admin_update_product', product_id=p.id) }}" method="post" enctype="multipart/form-data">
-          <img class="thumb" src="{{ p.image or '' }}" alt="" onerror="this.style.visibility='hidden'">
-
-          <div class="fields">
-            <div class="field span-2">
-              <label>Name</label>
-              <input type="text" name="name" value="{{ p.name }}" required>
+    <!-- Create (collapsible) -->
+    <details class="accordion" id="panel-create" open>
+      <summary>
+        Create new product
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="panel-body">
+        <section class="card" style="box-shadow:none; border:0; padding:0;">
+          <form action="{{ url_for('admin_create_product') }}" method="post" enctype="multipart/form-data">
+            <div class="fields">
+              <div class="field span-2">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="e.g. Classic Belt-Drive Turntable" required>
+              </div>
+              <div class="field">
+                <label>SKU</label>
+                <input type="text" name="sku" placeholder="Optional">
+              </div>
+              <div class="field">
+                <label>Category</label>
+                <select name="category" required>
+                  <option value="" disabled selected>Select category</option>
+                  {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label>Price</label>
+                <input type="number" name="price" step="0.01" placeholder="0.00" required>
+              </div>
+              <div class="field">
+                <label>Stock</label>
+                <input type="number" name="stock" step="1" value="0">
+              </div>
+              <div class="field span-3">
+                <label>Image URL</label>
+                <input type="text" name="image_url" placeholder="/static/images/turntable1.jpg">
+              </div>
+              <div class="field">
+                <label>Upload Image</label>
+                <input type="file" name="image_file" accept="image/*">
+              </div>
+              <div class="field span-4">
+                <label>Description</label>
+                <textarea name="description" placeholder="Short, helpful description"></textarea>
+              </div>
+              <div class="actions span-4">
+                <button class="btn" type="submit">Create</button>
+              </div>
             </div>
+          </form>
+        </section>
+      </div>
+    </details>
 
-            <div class="field">
-              <label>SKU</label>
-              <input type="text" name="sku" value="{{ p.sku or '' }}">
-            </div>
+    <!-- All products (collapsible) -->
+    <details class="accordion" id="panel-products" open style="margin-top:16px;">
+      <summary>
+        All products
+        <span class="muted">manage and edit</span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="panel-body">
+        <section class="card" style="box-shadow:none; border:0; padding:0;">
+          {% for p in products %}
+            <form class="product-form" action="{{ url_for('admin_update_product', product_id=p.id) }}" method="post" enctype="multipart/form-data">
+              <img class="thumb" src="{{ p.image or '' }}" alt="" onerror="this.style.visibility='hidden'">
 
-            <div class="field">
-              <label>Category</label>
-              <select name="category" required>
-                {% for c in categories %}
-                  <option value="{{ c }}" {% if c == p.category %}selected{% endif %}>{{ c }}</option>
-                {% endfor %}
-              </select>
-            </div>
+              <div class="fields">
+                <div class="field span-2">
+                  <label>Name</label>
+                  <input type="text" name="name" value="{{ p.name }}" required>
+                </div>
 
-            <div class="field">
-              <label>Price</label>
-              <input type="number" name="price" step="0.01" value="{{ '%.2f'|format(p.price) }}" required>
-            </div>
+                <div class="field">
+                  <label>SKU</label>
+                  <input type="text" name="sku" value="{{ p.sku or '' }}">
+                </div>
 
-            <div class="field">
-              <label>Stock</label>
-              <input type="number" name="stock" step="1" value="{{ p.stock }}">
-            </div>
+                <div class="field">
+                  <label>Category</label>
+                  <select name="category" required>
+                    {% for c in categories %}
+                      <option value="{{ c }}" {% if c == p.category %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
 
-            <div class="field span-3">
-              <label>Image URL</label>
-              <input type="text" name="image_url" placeholder="/static/images/..." value="{{ p.image or '' }}">
-            </div>
+                <div class="field">
+                  <label>Price</label>
+                  <input type="number" name="price" step="0.01" value="{{ '%.2f'|format(p.price) }}" required>
+                </div>
 
-            <div class="field">
-              <label>Upload Image</label>
-              <input type="file" name="image_file" accept="image/*">
-            </div>
+                <div class="field">
+                  <label>Stock</label>
+                  <input type="number" name="stock" step="1" value="{{ p.stock }}">
+                </div>
 
-            <div class="field span-4">
-              <label>Description</label>
-              <textarea name="description" rows="3">{{ p.description }}</textarea>
-            </div>
+                <div class="field span-3">
+                  <label>Image URL</label>
+                  <input type="text" name="image_url" placeholder="/static/images/..." value="{{ p.image or '' }}">
+                </div>
 
-            <div class="actions span-4">
-              <button class="btn" type="submit">Save</button>
-              <button class="btn danger" formaction="{{ url_for('admin_delete_product', product_id=p.id) }}" formmethod="post"
-                      onclick="return confirm('Delete this product? This cannot be undone.');">
-                Delete
-              </button>
-              <span style="margin-left:auto; color:#666;">ID #{{ p.id }}</span>
+                <div class="field">
+                  <label>Upload Image</label>
+                  <input type="file" name="image_file" accept="image/*">
+                </div>
+
+                <div class="field span-4">
+                  <label>Description</label>
+                  <textarea name="description" rows="3">{{ p.description }}</textarea>
+                </div>
+
+                <div class="actions span-4">
+                  <button class="btn" type="submit">Save</button>
+                  <button class="btn danger" formaction="{{ url_for('admin_delete_product', product_id=p.id) }}" formmethod="post"
+                          onclick="return confirm('Delete this product? This cannot be undone.');">
+                    Delete
+                  </button>
+                  <span style="margin-left:auto; color:#666;">ID #{{ p.id }}</span>
+                </div>
+              </div>
+            </form>
+          {% else %}
+            <p style="color:#666;">No products found.</p>
+          {% endfor %}
+        </section>
+      </div>
+    </details>
+
+    <!-- Orders (collapsible, placeholder for now) -->
+    <details class="accordion" id="panel-orders" style="margin-top:16px;">
+      <summary>
+        Orders
+        <span class="muted">history and management</span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="panel-body">
+        <section class="card" style="box-shadow:none; border:0; padding:0;">
+          {% for o in orders %}
+            <div class="order" style="border-bottom:1px solid rgba(0,0,0,0.08); padding:16px 0;">
+              <div style="display:flex; gap:12px; align-items:center;">
+                <div style="flex-shrink:0;">
+                  <strong style="font-size:1.1rem;">#{{ o.id }}</strong>
+                  <div class="muted" style="font-size:0.85rem;">{{ o.placed_at }}</div>
+                </div>
+                <div style="flex-grow:1;">
+                  <div style="font-weight:500;">{{ o.first_name }} {{ o.last_name }}</div>
+                  <div class="muted" style="font-size:0.85rem;">{{ o.email }} | {{ o.phone }}</div>
+                  <div class="muted" style="font-size:0.85rem;">
+                    {{ o.address_line1 }}{% if o.address_line2 %}, {{ o.address_line2 }}{% endif %}, {{ o.city }}, {{ o.state }} {{ o.postal_code }}, {{ o.country }}
+                  </div>
+                </div>
+                <div style="text-align:right; min-width:260px;">
+                  <div style="font-weight:500;">${{ '%.2f'|format(o.total) }}</div>
+
+                  <!-- NEW: inline status update form -->
+                  <form action="{{ url_for('admin_update_order_status', order_id=o.id) }}" method="post" style="display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:6px;">
+                    <label class="muted" style="font-size:0.85rem;">Status</label>
+                    <select name="status" style="padding:6px 8px; border:1px solid rgba(0,0,0,0.25); border-radius:6px;">
+                      {% if o.status not in statuses %}
+                        <option value="{{ o.status }}" selected disabled>{{ o.status|capitalize }} (current)</option>
+                      {% endif %}
+                      {% for st in statuses %}
+                        <option value="{{ st }}" {% if st == o.status %}selected{% endif %}>{{ st|capitalize }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn" type="submit" style="padding:8px 12px;">Update</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Order items (collapsible) -->
+              <details class="accordion" style="margin-top:12px;">
+                <summary>
+                  <span style="font-weight:500;">View Items ({{ o["items"]|length }})</span>
+                  <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9l6 6 6-6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </summary>
+                <div class="panel-body">
+                  <div style="display:grid; grid-template-columns:1fr 80px 80px; gap:12px;">
+                    <div><strong>Product</strong></div>
+                    <div style="text-align:center;"><strong>Qty</strong></div>
+                    <div style="text-align:right;"><strong>Price</strong></div>
+                  </div>
+                  {% for item in o["items"] %}
+                    <div style="display:grid; grid-template-columns:1fr 80px 80px; gap:12px; padding:8px 0; border-top:1px solid rgba(0,0,0,0.06);">
+                      <div style="display:flex; gap:8px; align-items:center;">
+                        <img src="{{ item.image }}" alt="{{ item.name }}" style="width:60px; height:45px; object-fit:cover; border-radius:8px; border:1px solid rgba(0,0,0,0.15);">
+                        <div>
+                          <div style="font-weight:500;">{{ item.name }}</div>
+                          <div class="muted" style="font-size:0.85rem;">SKU: {{ item.sku }}</div>
+                        </div>
+                      </div>
+                      <div style="text-align:center;">{{ item.quantity }}</div>
+                      <div style="text-align:right;">${{ '%.2f'|format(item.line_total) }}</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </details>
             </div>
-          </div>
-        </form>
-      {% else %}
-        <p style="color:#666;">No products found.</p>
-      {% endfor %}
-    </section>
+          {% else %}
+            <p class="muted" style="padding:16px 0;">No orders found.</p>
+          {% endfor %}
+        </section>
+      </div>
+    </details>
   </main>
+
+  <script>
+    // Persist open/closed state of panels
+    document.querySelectorAll('details.accordion').forEach(d => {
+      const key = 'admin.panel.' + (d.id || '');
+      if (key) {
+        const saved = localStorage.getItem(key);
+        if (saved !== null) d.open = saved === 'open';
+        d.addEventListener('toggle', () => localStorage.setItem(key, d.open ? 'open' : 'closed'));
+      }
+    });
+  </script>
 </body>
 </html>
