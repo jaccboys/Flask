@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from werkzeug.utils import secure_filename  # NEW
 import re
+import secrets  # NEW
 
 ORDER_STATUSES = ["pending", "shipped", "cancelled", "refunded"]  # removed "paid"
 
@@ -22,9 +23,18 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    # Ensure FK behavior during deletes/updates
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
+
+# NEW: simple migration to add 'salt' column if missing
+def ensure_schema_migrations():
+    with get_db() as conn:
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(customers)").fetchall()}
+        if "salt" not in cols:
+            conn.execute("ALTER TABLE customers ADD COLUMN salt TEXT")
+            conn.commit()
+
+ensure_schema_migrations()  # run at import
 
 def login_required(view):
     @wraps(view)
@@ -76,6 +86,9 @@ def is_strong_password(pw: str) -> bool:
         and re.search(r"\d", pw)
     ) is not None
 
+def _generate_salt() -> str:
+    return secrets.token_hex(16)  # 32-char hex
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -94,15 +107,18 @@ def signup():
         if not is_strong_password(password):
             flash("Password must be at least 10 characters and include uppercase, lowercase, and a number.", "error")
             return render_template("signup.html"), 400
-        pwd_hash = generate_password_hash(password)
+        # NEW: salt + hash
+        salt = _generate_salt()
+        salted = password + salt
+        pwd_hash = generate_password_hash(salted)
         try:
             with get_db() as conn:
                 conn.execute(
                     """
-                    INSERT INTO customers (first_name, last_name, email, password_hash)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO customers (first_name, last_name, email, password_hash, salt)
+                    VALUES (?, ?, ?, ?, ?)
                     """,
-                    (first, last, email, pwd_hash),
+                    (first, last, email, pwd_hash, salt),
                 )
                 user_id = conn.execute("SELECT id FROM customers WHERE email = ?", (email,)).fetchone()["id"]
             session["user_id"] = user_id
@@ -121,14 +137,31 @@ def login():
 
         with get_db() as conn:
             row = conn.execute(
-                "SELECT id, email, password_hash FROM customers WHERE email = ?",
+                "SELECT id, email, password_hash, salt FROM customers WHERE email = ?",
                 (email,),
             ).fetchone()
 
-        if row and check_password_hash(row["password_hash"], password):
-            session["user_id"] = row["id"]
-            session["email"] = row["email"]
-            return redirect(url_for("account"))
+        if row:
+            salt = row["salt"]
+            # If salt exists, verify salted; otherwise verify legacy hash.
+            combined = (password + salt) if salt else password
+            if check_password_hash(row["password_hash"], combined):
+                # Optional upgrade: if legacy (no salt), upgrade now.
+                if not salt:
+                    try:
+                        with get_db() as conn:
+                            new_salt = _generate_salt()
+                            new_hash = generate_password_hash(password + new_salt)
+                            conn.execute(
+                                "UPDATE customers SET password_hash = ?, salt = ? WHERE id = ?",
+                                (new_hash, new_salt, row["id"]),
+                            )
+                            conn.commit()
+                    except Exception:
+                        pass  # non-fatal
+                session["user_id"] = row["id"]
+                session["email"] = row["email"]
+                return redirect(url_for("account"))
 
         flash("Invalid email or password.", "error")
         return render_template("login.html"), 401

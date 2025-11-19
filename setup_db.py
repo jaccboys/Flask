@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS customers (
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
+    salt TEXT,  -- NEW: per-user salt
     phone TEXT,
     address_line1 TEXT,
     address_line2 TEXT,
