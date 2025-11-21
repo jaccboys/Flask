@@ -194,17 +194,17 @@ def fetch_products_by_category(category: str):
 @app.route("/turntables")
 def turntables():
     items = fetch_products_by_category("Turntable")
-    return render_template("category.html", title="Turntables", items=items)
+    return render_template("turntables.html", items=items)
 
 @app.route("/speakers")
 def speakers():
     items = fetch_products_by_category("Speaker")
-    return render_template("category.html", title="Speakers", items=items)
+    return render_template("speakers.html", items=items)
 
 @app.route("/amplifiers")
 def amplifiers():
     items = fetch_products_by_category("Amplifier")
-    return render_template("category.html", title="Amplifiers", items=items)
+    return render_template("amplifiers.html", items=items)
 
 @app.route("/test")
 def test_page():
