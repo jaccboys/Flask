@@ -1,12 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Prism Audio - Home</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8">
+<title>Prism Audio — Essential Accessories</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!-- Removed Playfair link -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Heading + subtitle modern font */
+.hero-copy h1 {
+  font-family:"Plus Jakarta Sans",Inter,sans-serif;
+  font-size:clamp(2.6rem,5vw,3.4rem);
+  line-height:1.04;
+  margin:0 0 18px;
+  font-weight:600;
+  letter-spacing:.3px;
+  -webkit-font-smoothing:antialiased;
+}
+.hero-copy h1 .subtitle {
+  display:block;
+  font-size:clamp(1.02rem,1.15vw,1.18rem);
+  font-weight:500;
+  color:#6b6b6b;
+  margin-top:10px;
+  letter-spacing:.3px;
+}
+
+/* REMOVE old Playfair override (replaced) */
+
+/* Dark‑mode tweak for subtitle */
+body.dark-mode .hero-copy h1 .subtitle { color:#9d9d9d!important; }
+
       body.products-page { background:linear-gradient(180deg,#faf7f4,#f3efe9); color:#1a1a1a; font-family:Inter,system-ui,sans-serif; }
       nav { background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,0.98)); border-bottom:1px solid rgba(139,90,65,0.1); box-shadow:0 4px 16px rgba(26,26,26,0.04); backdrop-filter:blur(10px) saturate(120%); display:flex; justify-content:center; align-items:center; padding:1.25rem 3rem; position:fixed; top:0; left:0; right:0; width:100%; z-index:100; }
       .logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.3rem; }
@@ -244,6 +269,25 @@
       .featured-card .kv,
       .featured-card .card-body,
       .category-panel .category-content { position:relative; z-index:6; }
+
+      /* Modern elegant heading font */
+      .hero h1,
+      .hero-content h1,
+      h1,
+      .logo { font-family:"Plus Jakarta Sans",Inter,sans-serif; font-weight:600; letter-spacing:.25px; }
+
+      /* Optional accent gradient for a span inside h1 */
+      .hero h1 .accent,
+      .hero-content h1 .accent {
+        background:linear-gradient(90deg,#ff864c,#ffb085 60%,#ffc7a9);
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+      }
+
+      /* If previous Playfair styles exist, override them */
+      .hero h1,
+      .hero-content h1 { font-size:clamp(2.4rem,5vw,3.6rem); line-height:1.02; margin:0; }
     </style>
 </head>
 <body class="products-page">
@@ -271,14 +315,17 @@
 
     <main class="products-container container">
         <header class="page-hero">
-            <div class="hero-copy">
-                <h1>Essential Accessories<br><span style="font-weight:400; color:#6b6b6b; font-size:1.05rem;">Precision parts and care kits for discerning listeners</span></h1>
-                <p>Curated collection of turntables, speakers and amplifiers. Photography-led presentation and refined details for confident buying.</p>
-                <div class="hero-actions">
-                    <a class="cta-primary" href="{{ url_for('products') }}">Shop all</a>
-                    <a class="cta-ghost" href="{{ url_for('about') }}">About</a>
-                </div>
+          <div class="hero-copy">
+            <h1>
+              <span class="accent">Essential Accessories</span>
+              <span class="subtitle">Precision parts and care kits for discerning listeners</span>
+            </h1>
+            <p>Curated collection of turntables, speakers and amplifiers. Photography-led presentation and refined details for confident buying.</p>
+            <div class="hero-actions">
+                <a class="cta-primary" href="{{ url_for('products') }}">Shop all</a>
+                <a class="cta-ghost" href="{{ url_for('about') }}">About</a>
             </div>
+          </div>
         </header>
 
         {# Horizontal category sections (alternating image / text) #}
@@ -308,7 +355,7 @@
                     {% endif %}
                   </div>
                   <div class="category-content">
-                    <h2 style="font-family:'Playfair Display',serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                    <h2>{{ title }}</h2>
                     <p style="color:#6b6b6b; margin:0; max-width:62ch;">
                       {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
                     </p>
@@ -318,7 +365,7 @@
                   </div>
                 {% else %}
                   <div class="category-content">
-                    <h2 style="font-family:'Playfair Display',serif; font-size:2rem; margin:0;">{{ title }}</h2>
+                    <h2>{{ title }}</h2>
                     <p style="color:#6b6b6b; margin:0; max-width:62ch;">
                       {% if item %}{{ item.description }}{% else %}Explore our {{ title|lower() }} collection.{% endif %}
                     </p>
