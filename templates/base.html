@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Premium turntables, speakers, and amplifiers for audiophiles">
+    <meta name="theme-color" content="#8a63ff">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VinylStore">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/images/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="/static/images/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/static/images/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/images/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/images/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/static/images/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="/static/images/icon-384x384.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/images/icon-512x512.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/icon-72x72.png">
+    
+    <title>{% block title %}Vinyl Audio Store{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    {% block content %}{% endblock %}
+    
+    <!-- PWA Install Button (optional) -->
+    <button id="install-button" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; background: linear-gradient(180deg, #8a63ff, #5b3fd6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(138, 99, 255, 0.3); z-index: 1000; font-weight: 600;">
+        Install App
+    </button>
+    
+    <!-- PWA Script -->
+    <script src="/static/js/pwa.js"></script>
+</body>
+</html>

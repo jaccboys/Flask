@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_from_directory
 import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -723,6 +723,23 @@ def order_confirmation(order_id: int):
         items=[dict(r) for r in items_rows],
     )
 
+@app.route('/static/sw.js')
+def service_worker():
+    response = send_from_directory('static', 'sw.js')
+    response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/manifest+json')
+
+@app.route('/static/manifest.json')
+def manifest_static():
+    return send_from_directory('static', 'manifest.json', mimetype='application/manifest+json')
+
 # Start the dev server when running this file directly
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
+
+#72, 96, 128, 144, 192, 384, 512
