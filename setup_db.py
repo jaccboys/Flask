@@ -142,11 +142,11 @@ SEED_PRODUCTS = [
         "image": "/static/images/speaker4.jpg"
     },
 
-    # Amplifiers
+    # Accessories
     {
         "id": 9,
         "name": "Integrated Amplifier",
-        "category": "Amplifier",
+        "category": "Accessory",
         "price": 449.99,
         "stock": 11,
         "description": "High-quality integrated amplifier with phono input and 80W per channel.",
@@ -155,7 +155,7 @@ SEED_PRODUCTS = [
     {
         "id": 10,
         "name": "Tube Phono Preamp",
-        "category": "Amplifier",
+        "category": "Accessory",
         "price": 329.99,
         "stock": 9,
         "description": "Warm tube-driven phono stage with RIAA equalization for vinyl playback.",
@@ -164,7 +164,7 @@ SEED_PRODUCTS = [
     {
         "id": 11,
         "name": "Class D Power Amplifier",
-        "category": "Amplifier",
+        "category": "Accessory",
         "price": 549.99,
         "stock": 8,
         "description": "Efficient class D amplifier delivering 150W of clean power with minimal distortion.",
@@ -173,7 +173,7 @@ SEED_PRODUCTS = [
     {
         "id": 12,
         "name": "Hybrid Valve Amplifier",
-        "category": "Amplifier",
+        "category": "Accessory",
         "price": 899.99,
         "stock": 4,
         "description": "Premium hybrid design combining tube warmth with solid-state reliability.",

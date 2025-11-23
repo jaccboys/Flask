@@ -46,7 +46,7 @@ def login_required(view):
 
 @app.route("/")
 def home():
-    categories = ["Turntable", "Speaker", "Amplifier"]
+    categories = ["Turntable", "Speaker", "Accessory"]
     samples = {}
     with get_db() as conn:
         for cat in categories:
@@ -203,8 +203,8 @@ def speakers():
 
 @app.route("/amplifiers")
 def amplifiers():
-    items = fetch_products_by_category("Amplifier")
-    return render_template("amplifiers.html", items=items)
+    items = fetch_products_by_category("Accessory")
+    return render_template("accessories.html", items=items)
 
 @app.route("/test")
 def test_page():
@@ -286,7 +286,7 @@ def admin_page():
         else:
             orders = []
 
-    categories = ["Turntable", "Speaker", "Amplifier"]
+    categories = ["Turntable", "Speaker", "Accessory"]
     return render_template(
         "admin.html",
         products=products,

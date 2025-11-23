@@ -41,11 +41,13 @@
         }
         
         .logo { 
-            color: #111; 
-            font-weight:700; 
-            letter-spacing:1px; 
-            font-size: 1.3rem;
-            text-align: center;
+          font-family: "Plus Jakarta Sans", Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+          color: #111; 
+          font-weight: 600;
+          letter-spacing: .25px;
+          font-size: 1.3rem;
+          -webkit-font-smoothing: antialiased;
+          text-align: center;
         }
         
         /* Hamburger menu button */
@@ -215,11 +217,13 @@
             max-width:660px;
         }
         .hero-copy h1 {
-            font-family: 'Playfair Display', serif;
-            font-size:2.6rem;
-            margin:0 0 10px 0;
-            color:#0f0f0f;
+            font-family:"Plus Jakarta Sans",Inter,"Helvetica Neue",Helvetica,Arial,sans-serif;
+            font-size:clamp(2.4rem,5vw,3.6rem);
             line-height:1.02;
+            margin:0 0 10px 0;
+            font-weight:600;
+            letter-spacing:.25px;
+            -webkit-font-smoothing:antialiased;
         }
         .hero-copy p {
             color: #5b5b5b;
@@ -294,18 +298,31 @@
             flex-direction:column;
             box-shadow: 0 10px 30px rgba(20,20,20,0.06);
             transition: transform .18s ease, box-shadow .18s ease;
-            position:relative; /* added position for overlay */
+            position:relative;
+            min-height:500px;
+            max-height:580px;
         }
         .product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 46px rgba(18,18,18,0.08); }
-        .product-media { width:100%; height:320px; background:#f6f6f6; display:block; object-fit:cover; }
-        .product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; }
-        .product-body { display:flex; flex-direction:column; flex:1; }
-        .product-body .content { flex:1; display:flex; flex-direction:column; }
+        .product-media { width:100%; height:320px; background:#f6f6f6; display:block; object-fit:cover; flex-shrink:0; }
+        .product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; overflow:hidden; }
+        .product-body .content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
         .product-title { font-family: 'Playfair Display', serif; font-size:1.15rem; color:#111; margin:0; }
         .product-meta { color:#6b6b6b; font-size:0.95rem; }
-        .product-desc { color:#5c5c5c; font-size:0.95rem; margin-top:8px; flex:1; margin-bottom:0; }
-        .product-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; margin-top:auto; }
-        .price { font-weight:700; color:#111; font-size:1.05rem; }
+        .product-desc { 
+            color:#5c5c5c; 
+            font-size:0.95rem; 
+            margin-top:8px; 
+            flex:1; 
+            margin-bottom:0;
+            overflow:hidden;
+            display:-webkit-box;
+            -webkit-line-clamp:3;
+            line-clamp:3;
+            -webkit-box-orient:vertical;
+            line-height:1.4;
+        }
+        .product-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-shrink:0; }
+        .price { font-weight:700; color:#ff864c; font-size:1.05rem; }
         .btn-details {
             background:transparent;
             border:1px solid rgba(0,0,0,0.15);
@@ -356,7 +373,7 @@
         body.dark-mode .hero-copy h1,
         header h1,
         h1 {
-            color: #f5f5f5 !important;
+          color: #f5f5f5 !important;
         }
         
         body.dark-mode .menu-toggle {
@@ -452,7 +469,7 @@
         }
         
         body.dark-mode .price {
-            color: #f5f5f5 !important;
+            color: #ff864c !important;
         }
         
         body.dark-mode header h1,
@@ -479,7 +496,7 @@
         <a href="{{ url_for('products') }}">Products</a>
         <a href="{{ url_for('turntables') }}">Turntables</a>
         <a href="{{ url_for('speakers') }}">Speakers</a>
-        <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+        <a href="{{ url_for('amplifiers') }}">Accessories</a>
         <a href="{{ url_for('about') }}">About</a>
         <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a>
         <button id="darkModeToggle">☾ Dark Mode</button>

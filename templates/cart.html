@@ -6,14 +6,42 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Add this to the <head> section of your HTML templates -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#ff864c">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <style>
+    :root { --accent:#ff864c; }
     body.products-page { background:linear-gradient(180deg,#faf7f4,#f3efe9); color:#1a1a1a; font-family:Inter,system-ui,sans-serif; }
     nav { background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,0.98)); border-bottom:1px solid rgba(139,90,65,0.1); box-shadow:0 4px 16px rgba(26,26,26,0.04); backdrop-filter:blur(10px) saturate(120%); display:flex; justify-content:center; align-items:center; padding:1.25rem 3rem; position:fixed; top:0; left:0; right:0; width:100%; z-index:100; }
-    .logo { color:#111; font-weight:700; letter-spacing:1px; font-size:1.3rem; }
+    .logo { 
+      font-family: "Plus Jakarta Sans", Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color:#111; 
+      font-weight: 600;
+      letter-spacing: .25px;
+      font-size: 1.3rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Menu Toggle */
+    .menu-toggle { position:fixed; top:1.5rem; right:3rem; z-index:1001; background:rgba(17,17,17,0.08); border:1px solid rgba(0,0,0,0.1); padding:12px; border-radius:8px; cursor:pointer; transition:.3s; display:flex; flex-direction:column; gap:5px; width:40px; height:40px; justify-content:center; align-items:center; }
+    .menu-toggle span { width:24px; height:2px; background:#111; transition:.3s; border-radius:2px; }
+    .menu-toggle:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .menu-toggle.active span:nth-child(1){ transform:rotate(45deg) translate(6px,6px); }
+    .menu-toggle.active span:nth-child(2){ opacity:0; }
+    .menu-toggle.active span:nth-child(3){ transform:rotate(-45deg) translate(6px,-6px); }
+    
+    /* Sidebar Navigation */
+    .nav-links { position:fixed; top:0; right:-350px; width:350px; height:100vh; background:rgba(255,255,255,0.98); backdrop-filter:blur(20px); box-shadow:-4px 0 24px rgba(0,0,0,0.1); z-index:1000; transition:right .4s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; padding:100px 40px 40px; gap:8px; }
+    .nav-links.active { right:0; }
+    .nav-links a { color:rgba(20,20,20,0.7); text-decoration:none; padding:16px 20px; border-radius:8px; transition:.3s; font-size:1.1rem; font-weight:500; }
+    .nav-links a:hover { color:#111; background:rgba(17,17,17,0.05); transform:translateX(-4px); }
+    .nav-links a.login-cta { background:#111; color:#fff; font-weight:600; text-decoration:none; padding:16px 20px; border-radius:12px; border:1px solid rgba(0,0,0,0.5); font-size:1.05rem; letter-spacing:.25px; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:.25s; }
+    .nav-links a.login-cta:hover { background:#000; border-color:#000; box-shadow:0 4px 14px rgba(0,0,0,0.18); transform:translateX(-4px); }
+    #darkModeToggle { background:rgba(17,17,17,0.08); border:1px solid rgba(0,0,0,0.1); padding:12px 20px; border-radius:8px; cursor:pointer; color:#111; font-weight:600; margin-top:20px; transition:.3s; font-size:1.1rem; text-align:left; }
+    #darkModeToggle:hover { background:rgba(17,17,17,0.12); transform:translateX(-4px); }
+    .menu-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0); z-index:999; pointer-events:none; transition:background .4s; }
+    .menu-overlay.active { background:rgba(0,0,0,0.3); pointer-events:all; }
+    
     .products-container { max-width:1100px; margin:120px auto 60px; padding:0 20px; }
     .cart-table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(20,20,20,0.06); }
     .cart-table th, .cart-table td { padding:14px 16px; border-bottom:1px solid rgba(0,0,0,0.06); vertical-align:middle; }
@@ -26,24 +54,69 @@
     .summary { margin-top:16px; display:flex; justify-content:flex-end; gap:20px; align-items:center; }
     .muted { color:#6b6b6b; }
     .empty { padding:24px; color:#6b6b6b; }
-    body.dark-mode .cart-table { background:rgba(40,40,40,0.9); border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 30px rgba(0,0,0,0.5); }
-    body.dark-mode .cart-table th { background:rgba(255,255,255,0.06); color:#e0e0e0; }
-    body.dark-mode .btn { background:rgba(255,255,255,0.06); color:#e0e0e0; border-color:rgba(255,255,255,0.2); }
+    
     .flash { padding:10px 12px; border-radius:8px; margin-bottom:8px; color:#333; }
     .flash.error { background:#ffecec; }
     .flash.success { background:#ecfff1; }
     .flash.info { background:#e8f3ff; }
-    /* dark mode */
+    
+    h1,
+    .logo { font-family:"Plus Jakarta Sans",Inter,sans-serif; }
+    
+    /* Dark Mode */
+    body.dark-mode { background:linear-gradient(180deg,#1a1a1a,#0f0f0f)!important; color:#e0e0e0!important; }
+    body.dark-mode nav { background:linear-gradient(180deg,rgba(30,30,30,0.95),rgba(20,20,20,0.98))!important; border-bottom:1px solid rgba(255,255,255,0.1)!important; }
+    body.dark-mode .logo { color:#e0e0e0!important; }
+    body.dark-mode .menu-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); }
+    body.dark-mode .menu-toggle span { background:#fff; }
+    body.dark-mode .nav-links { background:rgba(30,30,30,0.98); box-shadow:-4px 0 24px rgba(0,0,0,0.5); }
+    body.dark-mode .nav-links a { color:rgba(255,255,255,0.7)!important; }
+    body.dark-mode .nav-links a:hover { color:#fff!important; background:rgba(255,255,255,0.1); }
+    body.dark-mode .nav-links a.login-cta { background:#fff!important; color:#111!important; border:1px solid rgba(255,255,255,0.25); box-shadow:0 2px 10px rgba(0,0,0,0.55); }
+    body.dark-mode .nav-links a.login-cta:hover { background:#fff!important; color:#111!important; border-color:rgba(255,255,255,0.45); box-shadow:0 6px 18px rgba(0,0,0,0.7); }
+    body.dark-mode #darkModeToggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); color:#fff; }
+    body.dark-mode #darkModeToggle:hover { background:rgba(255,255,255,0.2); }
+    body.dark-mode .cart-table { background:rgba(40,40,40,0.9); border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+    body.dark-mode .cart-table th { background:rgba(255,255,255,0.06); color:#e0e0e0; }
+    body.dark-mode .cart-table td { color:#e0e0e0; border-bottom:1px solid rgba(255,255,255,0.06); }
+    body.dark-mode .btn { background:rgba(255,255,255,0.06); color:#e0e0e0; border-color:rgba(255,255,255,0.2); }
+    body.dark-mode .btn-primary { background:#fff; color:#111; border-color:#fff; }
+    body.dark-mode .muted { color:#999; }
+    body.dark-mode .empty { color:#999; }
+    body.dark-mode h1 { color:#e0e0e0; }
     body.dark-mode .flash { color:#e0e0e0; }
     body.dark-mode .flash.error { background:#5a1e1e; }
     body.dark-mode .flash.success { background:#1e4a2b; }
     body.dark-mode .flash.info { background:#153d5a; }
-    h1,
-    .logo { font-family:"Plus Jakarta Sans",Inter,sans-serif; }
   </style>
 </head>
 <body class="products-page">
   <nav><div class="logo">PRISM AUDIO</div></nav>
+  
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  
+  <div class="menu-overlay" id="menuOverlay"></div>
+  
+  <div class="nav-links" id="navMenu">
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('products') }}">Products</a>
+    <a href="{{ url_for('turntables') }}">Turntables</a>
+    <a href="{{ url_for('speakers') }}">Speakers</a>
+    <a href="{{ url_for('amplifiers') }}">Accessories</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('cart') }}">Cart ({{ cart_count if cart_count is defined else 0 }})</a>
+    <button id="darkModeToggle">☾ Dark Mode</button>
+    <div style="flex:1;"></div>
+    {% if session.get('user_id') %}
+      <a href="{{ url_for('account') }}">My Account</a>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    {% else %}
+      <a class="login-cta" href="{{ url_for('login') }}">Log in</a>
+      <a href="{{ url_for('signup') }}">Sign up</a>
+    {% endif %}
+  </div>
 
   <main class="products-container">
     <header style="margin-bottom:18px;">
@@ -112,7 +185,18 @@
   </main>
 
   <script>
-    // optional: reuse dark-mode toggle if you later add the menu here
+    const menuToggle=document.getElementById('menuToggle');
+    const navMenu=document.getElementById('navMenu');
+    const menuOverlay=document.getElementById('menuOverlay');
+    const toggle=document.getElementById('darkModeToggle');
+    const body=document.body;
+    menuToggle.addEventListener('click',()=>{menuToggle.classList.toggle('active');navMenu.classList.toggle('active');menuOverlay.classList.toggle('active');});
+    menuOverlay.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');});
+    navMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menuToggle.classList.remove('active');navMenu.classList.remove('active');menuOverlay.classList.remove('active');}));
+    if(localStorage.getItem('darkMode')==='enabled'){enableDarkMode();}
+    toggle.addEventListener('click',()=>{body.classList.contains('dark-mode')?disableDarkMode():enableDarkMode();});
+    function enableDarkMode(){ body.classList.add('dark-mode'); toggle.textContent='☀ Light Mode'; localStorage.setItem('darkMode','enabled'); }
+    function disableDarkMode(){ body.classList.remove('dark-mode'); toggle.textContent='☾ Dark Mode'; localStorage.removeItem('darkMode'); }
   </script>
 </body>
 </html>

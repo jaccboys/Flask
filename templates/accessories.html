@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Amplifiers — Prism Audio</title>
+<title>Accessories — Prism Audio</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
@@ -66,15 +66,15 @@ nav { background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,247,244,
 /* GRID */
 .page { max-width:1200px; margin:0 auto 70px; padding:0 2rem; }
 .product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; margin-top:10px; }
-.product-card { background:#fff; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(20,20,20,0.06); transition:.18s; border:1px solid rgba(0,0,0,0.06); position:relative; }
+.product-card { background:#fff; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(20,20,20,0.06); transition:.18s; border:1px solid rgba(0,0,0,0.06); position:relative; min-height:500px; max-height:550px; }
 .product-card:hover { transform:translateY(-6px); box-shadow:0 18px 46px rgba(18,18,18,0.08); border-color:var(--accent); }
-.product-media { width:100%; height:300px; object-fit:cover; background:#f6f6f6; }
-.badge { position:absolute; top:12px; left:12px; background:linear-gradient(90deg,#ffb347,#ff7e4d); color:#111; font-size:0.65rem; font-weight:700; letter-spacing:1px; padding:6px 10px; border-radius:40px; }
-.product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.product-media { width:100%; height:300px; object-fit:cover; background:#f6f6f6; flex-shrink:0; }
+/* .badge { position:absolute; top:12px; left:12px; background:linear-gradient(90deg,#ffb347,#ff7e4d); color:#111; font-size:0.65rem; font-weight:700; letter-spacing:1px; padding:6px 10px; border-radius:40px; } */
+.product-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; overflow:hidden; }
 .product-title { font-family:'Playfair Display',serif; font-size:1.15rem; margin:0; color:#111; }
 .product-meta { color:#6b6b6b; font-size:0.85rem; letter-spacing:.5px; text-transform:uppercase; }
-.product-desc { color:#5c5c5c; font-size:0.9rem; flex:1; }
-.product-footer { display:flex; justify-content:space-between; align-items:center; margin-top:auto; gap:10px; }
+.product-desc { color:#5c5c5c; font-size:0.9rem; flex:1; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; line-height:1.4; }
+.product-footer { display:flex; justify-content:space-between; align-items:center; margin-top:auto; gap:10px; flex-shrink:0; }
 .price { font-weight:700; color:var(--accent); }
 .btn-details, .btn-cart { background:#111; color:#fff; text-decoration:none; padding:8px 14px; border-radius:8px; font-size:0.85rem; font-weight:600; display:inline-block; border:1px solid transparent; transition:.25s; }
 .btn-details:hover, .btn-cart:hover { background:var(--accent); color:#111; }
@@ -107,7 +107,7 @@ body.dark-mode .hero-image::before { background:linear-gradient(90deg,rgba(0,0,0
   <a href="{{ url_for('products') }}">Products</a>
   <a href="{{ url_for('turntables') }}">Turntables</a>
   <a href="{{ url_for('speakers') }}">Speakers</a>
-  <a href="{{ url_for('amplifiers') }}">Amplifiers</a>
+  <a href="{{ url_for('amplifiers') }}">Accessories</a>
   <a href="{{ url_for('about') }}">About</a>
   <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a>
   <button id="darkModeToggle">☾ Dark Mode</button>
@@ -124,9 +124,9 @@ body.dark-mode .hero-image::before { background:linear-gradient(90deg,rgba(0,0,0
 <section class="hero-container">
   <div class="hero-image">
     <div class="hero-content">
-      <h1><span class="accent">Drive</span> the dynamics</h1>
-      <p>Reference power, low noise floors and musical transparency across integrated, tube and solid‑state designs.</p>
-      <a href="#catalog" class="hero-cta">Browse Amplifiers ↓</a>
+      <h1><span class="accent">Shape</span> your soundscape</h1>
+      <p>From cartridges to slipmats and vibration control, discover accessories that fine-tune every element of your listening environment.</p>
+      <a href="#catalog" class="hero-cta">Browse Accessories ↓</a>
     </div>
   </div>
 </section>
@@ -135,7 +135,7 @@ body.dark-mode .hero-image::before { background:linear-gradient(90deg,rgba(0,0,0
   <section class="product-grid">
     {% for p in items %}
     <article class="product-card" id="product-{{ p.id }}">
-      <span class="badge">{{ p.stock }} IN STOCK</span>
+      <!-- <span class="badge">{{ p.stock }} IN STOCK</span> -->
       <img class="product-media" src="{{ p.image }}" alt="{{ p.name }}">
       <div class="product-body">
         <div>
