@@ -233,6 +233,10 @@ def save_image_from_request(file_storage):
 
 @app.route("/admin", methods=["GET"])
 def admin_page():
+    # Check if admin is authenticated
+    if not session.get('admin_authenticated'):
+        return redirect(url_for('admin_login'))
+    
     # TODO: add authentication later
     with get_db() as conn:
         rows = conn.execute(
@@ -294,6 +298,26 @@ def admin_page():
         orders=orders,            # NEW
         statuses=ORDER_STATUSES,  # NEW
     )
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        password = request.form.get("password", "").strip()
+        if password == "OCTOPUS'S GARDEN":
+            session['admin_authenticated'] = True
+            flash("Access granted.", "success")
+            return redirect(url_for('admin_page'))
+        else:
+            flash("Incorrect password.", "error")
+            return redirect(url_for('admin_login'))
+    
+    return render_template("admin_login.html")
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop('admin_authenticated', None)
+    flash("Logged out from admin.", "info")
+    return redirect(url_for('home'))
 
 @app.post("/admin/product/create")
 def admin_create_product():
