@@ -206,11 +206,6 @@ def amplifiers():
     items = fetch_products_by_category("Accessory")
     return render_template("accessories.html", items=items)
 
-@app.route("/test")
-def test_page():
-    # Provide an empty samples dict; the template handles missing samples.
-    return render_template("index_test.html", samples={})
-
 # NEW: helpers for image upload
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
