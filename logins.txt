@@ -1,0 +1,6 @@
+Admin Password  - OCTOPUS'S GARDEN
+
+
+example user:
+email - example@gmail.com
+password - Example111
